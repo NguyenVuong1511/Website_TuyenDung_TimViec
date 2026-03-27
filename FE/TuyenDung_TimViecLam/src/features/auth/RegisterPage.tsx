@@ -1,9 +1,24 @@
 import { useState } from 'react';
-import { Eye, EyeOff, User, Mail, Lock, ArrowRight, ArrowBigLeft, Building2, Globe, MapPin, FileText } from 'lucide-react';
+import {
+  Eye, EyeOff, User, Mail, Lock, ArrowRight, ArrowBigLeft,
+  Building2, Globe, MapPin, FileText, Phone, Calendar, Briefcase,
+  Flame
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const inputClass = "w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all";
-const labelClass = "block text-xs font-semibold text-gray-600 mb-1.5";
+const inputClass =
+  'w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all';
+const labelClass = 'block text-xs font-semibold text-gray-600 mb-1.5';
+
+const SectionDivider = ({ title }: { title: string }) => (
+  <div className="flex items-center gap-3 pt-1">
+    <div className="flex-1 h-px bg-indigo-100" />
+    <span className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider whitespace-nowrap">
+      {title}
+    </span>
+    <div className="flex-1 h-px bg-indigo-100" />
+  </div>
+);
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,67 +29,58 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl flex rounded-3xl overflow-hidden shadow-2xl shadow-indigo-100/60">
+      <div className="w-full max-w-7xl flex rounded-3xl overflow-hidden shadow-2xl shadow-indigo-100/60">
 
-        {/* Left Panel - Branding */}
+        {/* Left Panel */}
         <div className="hidden lg:flex flex-col justify-between w-[42%] bg-linear-to-br from-purple-600 via-indigo-600 to-blue-500 p-10 relative overflow-hidden">
-          {/* Decorative dots */}
           <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
             {Array.from({ length: 8 }).map((_, row) =>
               Array.from({ length: 8 }).map((_, col) => (
-                <div
-                  key={`${row}-${col}`}
-                  className="absolute w-2 h-2 bg-white rounded-full"
-                  style={{ top: row * 24, right: col * 24 }}
-                />
+                <div key={`${row}-${col}`} className="absolute w-2 h-2 bg-white rounded-full"
+                  style={{ top: row * 24, right: col * 24 }} />
               ))
             )}
           </div>
           <div className="absolute bottom-0 left-0 w-48 h-48 opacity-10">
             {Array.from({ length: 6 }).map((_, row) =>
               Array.from({ length: 6 }).map((_, col) => (
-                <div
-                  key={`${row}-${col}`}
-                  className="absolute w-2 h-2 bg-white rounded-full"
-                  style={{ bottom: row * 24, left: col * 24 }}
-                />
+                <div key={`${row}-${col}`} className="absolute w-2 h-2 bg-white rounded-full"
+                  style={{ bottom: row * 24, left: col * 24 }} />
               ))
             )}
           </div>
 
-          {/* Logo */}
           <div className="flex flex-col z-10">
             <div className="text-[32px] font-black tracking-tighter text-white leading-none">
               Up<span className="text-white/70">Work</span>
             </div>
-            <span className="text-[11px] text-white/60 font-medium mt-1">
-              Tiếp lợi thế - Nối thành công
-            </span>
+            <span className="text-[11px] text-white/60 font-medium mt-1">Tiếp lợi thế - Nối thành công</span>
           </div>
 
-          {/* Center content */}
           <div className="z-10">
             <h2 className="text-3xl font-black text-white leading-tight mb-4">
-              {role === 'employer' ? <>Tìm kiếm<br />nhân tài!</> : <>Chào mừng bạn<br />đến với UpWork</>}
+              {role === 'employer'
+                ? <> Tìm kiếm<br />nhân tài!</>
+                : <> Chào mừng bạn<br />đến với UpWork</>}
             </h2>
             <p className="text-white/70 text-sm leading-relaxed">
               {role === 'employer'
-                ? 'Đăng tin tuyển dụng, quản lý hồ sơ ứng viên và xây dựng đội ngũ vững mạnh cho doanh nghiệp.'
-                : 'Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng dành cho bạn.'}
+                ? 'Đăng tin tuyển dụng, quản lý hồ sơ ứng viên và xây dựng đội ngũ vững mạnh.'
+                : 'Cùng xây dựng hồ sơ nổi bật và nhận cơ hội sự nghiệp lý tưởng dành cho bạn.'}
             </p>
           </div>
 
-          {/* Bottom */}
           <p className="text-white/40 text-xs z-10">© 2025 UpWork. All rights reserved.</p>
         </div>
 
-        {/* Right Panel - Form */}
+        {/* Right Panel */}
         <div className="flex-1 bg-white p-8 sm:p-10">
-          <button onClick={() => navigate("/")} className='flex items-center gap-2 text-sm text-indigo-600 font-semibold hover:underline mb-3'>
+          <button onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-sm text-indigo-600 font-semibold hover:underline mb-3">
             <ArrowBigLeft size={15} />Trang chủ
           </button>
 
-          {/* Mobile Logo */}
+          {/* Mobile logo */}
           <div className="flex flex-col mb-6 lg:hidden">
             <div className="text-[26px] font-black tracking-tighter text-gray-800 leading-none">
               Up<span className="bg-linear-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">Work</span>
@@ -87,90 +93,118 @@ const RegisterPage = () => {
 
           {/* Role Switcher */}
           <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            <button
-              onClick={() => setRole('candidate')}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${role === 'candidate'
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-                }`}
-            >
-              Ứng viên
-            </button>
-            <button
-              onClick={() => setRole('employer')}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${role === 'employer'
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-                }`}
-            >
-              Nhà tuyển dụng
-            </button>
+            {(['candidate', 'employer'] as const).map((r) => (
+              <button key={r} onClick={() => setRole(r)}
+                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${role === r
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'}`}>
+                {r === 'candidate' ? 'Ứng viên' : 'Nhà tuyển dụng'}
+              </button>
+            ))}
           </div>
 
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
 
             {/* ── Thông tin tài khoản ── */}
-            <div className="space-y-4">
-              {/* Full Name */}
-              <div>
-                <label className={labelClass}>Họ và tên</label>
-                <div className="relative">
-                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="text" placeholder="Nhập họ tên" className={inputClass} />
-                </div>
-              </div>
+            <SectionDivider title="Thông tin tài khoản" />
 
-              {/* Email */}
-              <div>
-                <label className={labelClass}>Email</label>
-                <div className="relative">
-                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="email" placeholder="Nhập email" className={inputClass} />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className={labelClass}>Mật khẩu</label>
-                <div className="relative">
-                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Nhập mật khẩu"
-                    className={inputClass}
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password */}
-              <div>
-                <label className={labelClass}>Xác nhận mật khẩu</label>
-                <div className="relative">
-                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type={showConfirm ? 'text' : 'password'}
-                    placeholder="Nhập lại mật khẩu"
-                    className={inputClass}
-                  />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
+            {/* Email */}
+            <div>
+              <label className={labelClass}>Email <span className="text-red-400">*</span></label>
+              <div className="relative">
+                <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="email" placeholder="Nhập email" className={inputClass} />
               </div>
             </div>
 
-            {/* ── Thông tin Nhà tuyển dụng (chỉ hiện khi chọn employer) ── */}
-            {role === 'employer' && (
-              <div className="space-y-4 pt-2">
-                {/* Divider */}
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-indigo-100" />
-                  <span className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider">Thông tin công ty</span>
-                  <div className="flex-1 h-px bg-indigo-100" />
+            {/* Password */}
+            <div>
+              <label className={labelClass}>Mật khẩu <span className="text-red-400">*</span></label>
+              <div className="relative">
+                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type={showPassword ? 'text' : 'password'} placeholder="Nhập mật khẩu" className={inputClass} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className={labelClass}>Xác nhận mật khẩu <span className="text-red-400">*</span></label>
+              <div className="relative">
+                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type={showConfirm ? 'text' : 'password'} placeholder="Nhập lại mật khẩu" className={inputClass} />
+                <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+
+            {/* ── Hồ sơ Ứng viên ── */}
+            {role === 'candidate' && (
+              <>
+                <SectionDivider title="Thông tin cá nhân" />
+
+                {/* FullName */}
+                <div>
+                  <label className={labelClass}>Họ và tên <span className="text-red-400">*</span></label>
+                  <div className="relative">
+                    <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="text" placeholder="Nhập họ và tên" className={inputClass} />
+                  </div>
                 </div>
+
+                {/* Phone */}
+                <div>
+                  <label className={labelClass}>Số điện thoại</label>
+                  <div className="relative">
+                    <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="tel" placeholder="VD: 0912 345 678" className={inputClass} />
+                  </div>
+                </div>
+
+                {/* DateOfBirth + Gender */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelClass}>Ngày sinh</label>
+                    <div className="relative">
+                      <Calendar size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input type="date" className={inputClass} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Giới tính</label>
+                    <div className="relative">
+                      <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <select className={inputClass + ' cursor-pointer'} defaultValue="">
+                        <option value="" disabled>Chọn giới tính</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Khác">Khác</option>
+                      </select>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div>
+                  <label className={labelClass}>Địa chỉ</label>
+                  <div className="relative">
+                    <MapPin size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="text" placeholder="Nhập địa chỉ của bạn" className={inputClass} />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── Hồ sơ Nhà tuyển dụng ── */}
+            {role === 'employer' && (
+              <>
+                <SectionDivider title="Thông tin công ty" />
 
                 {/* Company Name */}
                 <div>
@@ -181,7 +215,7 @@ const RegisterPage = () => {
                   </div>
                 </div>
 
-                {/* Address */}
+                {/* Company Address */}
                 <div>
                   <label className={labelClass}>Địa chỉ công ty</label>
                   <div className="relative">
@@ -190,7 +224,7 @@ const RegisterPage = () => {
                   </div>
                 </div>
 
-                {/* Website */}
+                {/* Company Website */}
                 <div>
                   <label className={labelClass}>Website công ty</label>
                   <div className="relative">
@@ -199,29 +233,25 @@ const RegisterPage = () => {
                   </div>
                 </div>
 
-                {/* Description */}
+                {/* Company Description */}
                 <div>
                   <label className={labelClass}>Mô tả công ty</label>
                   <div className="relative">
                     <FileText size={15} className="absolute left-3.5 top-3.5 text-gray-400" />
-                    <textarea
-                      rows={3}
-                      placeholder="Giới thiệu ngắn về công ty..."
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all resize-none"
-                    />
+                    <textarea rows={3} placeholder="Giới thiệu ngắn về công ty..."
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all resize-none" />
                   </div>
                 </div>
 
-
-              </div>
+              </>
             )}
 
             {/* Terms */}
             <label className="flex items-start gap-2.5 cursor-pointer group">
-              <div
-                onClick={() => setAgreed(!agreed)}
-                className={`mt-0.5 w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${agreed ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-400'}`}
-              >
+              <div onClick={() => setAgreed(!agreed)}
+                className={`mt-0.5 w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${agreed
+                  ? 'bg-indigo-600 border-indigo-600'
+                  : 'border-gray-300 group-hover:border-indigo-400'}`}>
                 {agreed && (
                   <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -238,10 +268,8 @@ const RegisterPage = () => {
             </label>
 
             {/* Submit */}
-            <button
-              type="submit"
-              className="w-full py-2.5 rounded-full bg-linear-to-r from-purple-500 to-blue-500 text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-sm shadow-indigo-200 flex items-center justify-center gap-2"
-            >
+            <button type="submit"
+              className="w-full py-2.5 rounded-full bg-linear-to-r from-purple-500 to-blue-500 text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-sm shadow-indigo-200 flex items-center justify-center gap-2">
               Đăng ký
               <ArrowRight size={15} />
             </button>
@@ -257,15 +285,24 @@ const RegisterPage = () => {
           {/* Social */}
           <div className="grid grid-cols-3 gap-2.5">
             <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-              <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115Z" /><path fill="#34A853" d="M16.04 18.013c-1.09.703-2.474 1.078-4.04 1.078a7.077 7.077 0 0 1-6.723-4.823l-4.04 3.067A11.965 11.965 0 0 0 12 24c2.933 0 5.735-1.043 7.834-3l-3.793-2.987Z" /><path fill="#4A90D9" d="M19.834 21c2.195-2.048 3.62-5.096 3.62-9 0-.71-.109-1.473-.272-2.182H12v4.637h6.436c-.317 1.559-1.17 2.766-2.395 3.558L19.834 21Z" /><path fill="#FBBC05" d="M5.277 14.268A7.12 7.12 0 0 1 4.909 12c0-.782.125-1.533.357-2.235L1.24 6.65A11.934 11.934 0 0 0 0 12c0 1.92.445 3.73 1.237 5.335l4.04-3.067Z" /></svg>
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115Z" />
+                <path fill="#34A853" d="M16.04 18.013c-1.09.703-2.474 1.078-4.04 1.078a7.077 7.077 0 0 1-6.723-4.823l-4.04 3.067A11.965 11.965 0 0 0 12 24c2.933 0 5.735-1.043 7.834-3l-3.793-2.987Z" />
+                <path fill="#4A90D9" d="M19.834 21c2.195-2.048 3.62-5.096 3.62-9 0-.71-.109-1.473-.272-2.182H12v4.637h6.436c-.317 1.559-1.17 2.766-2.395 3.558L19.834 21Z" />
+                <path fill="#FBBC05" d="M5.277 14.268A7.12 7.12 0 0 1 4.909 12c0-.782.125-1.533.357-2.235L1.24 6.65A11.934 11.934 0 0 0 0 12c0 1.92.445 3.73 1.237 5.335l4.04-3.067Z" />
+              </svg>
               Google
             </button>
             <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-              <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+              <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
               Facebook
             </button>
             <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-              <svg className="w-4 h-4" fill="#0A66C2" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
+              <svg className="w-4 h-4" fill="#0A66C2" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
               LinkedIn
             </button>
           </div>

@@ -1,0 +1,6 @@
+@TuyenDung_TimViec_HostAddress = http://localhost:5246
+
+GET {{TuyenDung_TimViec_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
