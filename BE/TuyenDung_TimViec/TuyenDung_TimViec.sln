@@ -5,6 +5,10 @@ VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuyenDung_TimViec", "TuyenDung_TimViec.csproj", "{1D324838-72F8-4B28-AE14-DC64A00C7E78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "..\ApiGateway\ApiGateway.csproj", "{FF2B435F-23DD-4764-9F95-8713B57332F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService", "..\IdentityService\IdentityService.csproj", "{E63F20AE-8055-4512-93F7-0E41F61C0F12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{1D324838-72F8-4B28-AE14-DC64A00C7E78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D324838-72F8-4B28-AE14-DC64A00C7E78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D324838-72F8-4B28-AE14-DC64A00C7E78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2B435F-23DD-4764-9F95-8713B57332F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2B435F-23DD-4764-9F95-8713B57332F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2B435F-23DD-4764-9F95-8713B57332F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2B435F-23DD-4764-9F95-8713B57332F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E63F20AE-8055-4512-93F7-0E41F61C0F12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E63F20AE-8055-4512-93F7-0E41F61C0F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E63F20AE-8055-4512-93F7-0E41F61C0F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E63F20AE-8055-4512-93F7-0E41F61C0F12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
