@@ -66,6 +66,10 @@ const Header = () => {
               Công ty
               <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
             </a>
+            <a href="#" className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors font-sans group">
+              Tin tức
+              <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
+            </a>
           </nav>
 
           {/* Right Section */}
