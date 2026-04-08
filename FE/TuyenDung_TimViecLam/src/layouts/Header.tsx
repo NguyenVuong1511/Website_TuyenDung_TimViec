@@ -42,14 +42,14 @@ const Header = () => {
           {/* Left: Logo */}
           <div className="flex items-center gap-8 xl:gap-12">
             {/* Logo */}
-            <div className="flex flex-col justify-center cursor-pointer">
+            <Link to="/" className="flex flex-col justify-center cursor-pointer hover:opacity-80 transition-opacity">
               <div className="text-[28px] font-black font-display tracking-tighter text-gray-800 leading-none">
                 Up<span className="bg-linear-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">Work</span>
               </div>
               <span className="text-[9px] text-gray-500 font-medium mt-0.5 hidden sm:block">
                 Tiếp lợi thế - Nối thành công
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Navigation - Desktop */}
