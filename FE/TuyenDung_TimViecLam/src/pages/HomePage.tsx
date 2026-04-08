@@ -3,6 +3,8 @@ import HeroSection from '../components/home/HeroSection';
 
 import JobCategories from '../components/home/JobCategories';
 import FeaturedJobs from '../components/home/FeaturedJobs';
+import TopEmployers from '../components/home/TopEmployers';
+import Footer from '../layouts/Footer';
 
 const HomePage = () => {
   return (
@@ -12,8 +14,10 @@ const HomePage = () => {
         <HeroSection />
         <JobCategories />
         <FeaturedJobs />
+        <TopEmployers />
         {/* Additional sections can be added here */}
       </main>
+      <Footer />
     </div>
   );
 };

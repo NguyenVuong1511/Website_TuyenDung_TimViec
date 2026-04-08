@@ -115,7 +115,7 @@ const categories = [
 
 const JobCategories = () => {
     return (
-        <section className="w-full bg-white py-10 md:py-16 font-sans">
+        <section className="w-full bg-slate-50 py-10 md:py-16 font-sans">
             <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header Row */}
