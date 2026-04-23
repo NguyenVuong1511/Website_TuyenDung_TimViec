@@ -133,7 +133,7 @@ const FeaturedJobs = () => {
     return (
         <section className="w-full bg-white py-16 md:py-24 font-sans border-t border-gray-100">
             <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 {/* Header Row */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                     <div>
@@ -158,8 +158,8 @@ const FeaturedJobs = () => {
                 {/* Jobs Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {featuredJobs.map((job) => (
-                        <div 
-                            key={job.id} 
+                        <div
+                            key={job.id}
                             className="bg-white rounded-xl border border-gray-100 p-5 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-xl hover:border-indigo-100 transition-all flex flex-col group"
                         >
                             {/* Top Info: Logo, Company, Heart */}

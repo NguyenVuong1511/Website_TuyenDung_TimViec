@@ -45,7 +45,36 @@
         "Get"
       ]
     },
-    // 4.JobService 
+    // 4.JobPosts (Danh sách bài đăng)
+    {
+      "DownstreamPathTemplate": "/api/jobposts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/jobposts",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/jobposts/top",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/jobposts/top",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    // 5.JobService 
     {
       "DownstreamPathTemplate": "/{catchAll}",
       "DownstreamScheme": "https",
