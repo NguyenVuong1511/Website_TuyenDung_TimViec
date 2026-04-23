@@ -1,14 +1,24 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, User, LogOut, Menu, X } from 'lucide-react';
+import { ChevronDown, User, LogOut, Menu, X, History, Heart, LayoutDashboard } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { logout, getToken } from '../services/authService';
+import { logout, getToken, getUserRole } from '../services/authService';
 import { isTokenExpired } from '../utils/jwt';
+
 
 const Header = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const role = (getUserRole() || '').toUpperCase();
+
+  // Debug: log role để kiểm tra tại sao không hiện menu
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log("Header - User Role:", role);
+    }
+  }, [isLoggedIn, role]);
+
 
   useEffect(() => {
     const checkToken = () => {
@@ -92,7 +102,7 @@ const Header = () => {
                   {showDropdown && (
                     <div className="absolute right-0 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
                       <Link
-                        to="/profile"
+                        to={(role === 'CANDIDATE' ? '/profile' : '/recruiter-profile')}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowDropdown(false)}
                       >
@@ -100,6 +110,44 @@ const Header = () => {
                         Hồ sơ cá nhân
                       </Link>
                       <div className="h-px bg-gray-100 my-1"></div>
+                      {/* Menu cho Ứng viên */}
+                      {role === 'CANDIDATE' && (
+                        <>
+                          <Link
+                            to="/applied-jobs"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            <History size={16} />
+                            Lịch sử ứng tuyển
+                          </Link>
+                          <div className="h-px bg-gray-100 my-1"></div>
+                          <Link
+                            to="/saved-jobs"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            <Heart size={16} />
+                            Việc làm đã lưu
+                          </Link>
+                          <div className="h-px bg-gray-100 my-1"></div>
+                        </>
+                      )}
+
+                      {/* Menu cho Nhà tuyển dụng */}
+                      {(role === 'RECRUITER' || role === 'RECRUITER') && (
+                        <>
+                          <Link
+                            to="/recruiter/dashboard"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            <LayoutDashboard size={16} />
+                            Quản lý tuyển dụng
+                          </Link>
+                          <div className="h-px bg-gray-100 my-1"></div>
+                        </>
+                      )}
                       <button
                         onClick={() => {
                           setShowDropdown(false);
@@ -174,7 +222,7 @@ const Header = () => {
             {isLoggedIn ? (
               <>
                 <Link
-                  to="/profile"
+                  to={role === 'CANDIDATE' ? '/profile' : '/recruiter-profile'}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -183,6 +231,44 @@ const Header = () => {
                   </div>
                   Trang cá nhân
                 </Link>
+
+                {role === 'CANDIDATE' && (
+                  <>
+                    <Link
+                      to="/applied-jobs"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <History size={18} />
+                      </div>
+                      Lịch sử ứng tuyển
+                    </Link>
+                    <Link
+                      to="/saved-jobs"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <Heart size={18} />
+                      </div>
+                      Việc làm đã lưu
+                    </Link>
+                  </>
+                )}
+
+                {(role === 'RECRUITER' || role === 'RECRUITER') && (
+                  <Link
+                    to="/recruiter/dashboard"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                      <LayoutDashboard size={18} />
+                    </div>
+                    Quản lý tuyển dụng
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     handleLogout();

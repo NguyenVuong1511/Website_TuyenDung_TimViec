@@ -9,7 +9,7 @@ export interface LoginResponse {
   token: string;
   userId: string;
   email: string;
-  role: 'candidate' | 'employer' | 'admin';
+  role: 'candidate' | 'recruiter' | 'admin';
   fullName?: string;
 }
 

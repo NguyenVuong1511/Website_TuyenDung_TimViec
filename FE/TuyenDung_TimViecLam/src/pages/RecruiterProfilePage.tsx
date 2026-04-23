@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import Header from '../layouts/Header';
 import Footer from '../layouts/Footer';
-import { 
-  MapPin, Users, Globe, Mail, 
+import {
+  MapPin, Users, Globe, Mail,
   ExternalLink, Share2, Briefcase, Heart, CheckCircle2,
   ChevronRight
 } from 'lucide-react';
 
-const EmployerProfilePage = () => {
+const RecruiterProfilePage = () => {
   // Mock company data
   const [company] = useState({
     name: 'VNG Corporation',
@@ -42,9 +42,9 @@ const EmployerProfilePage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
       <Header />
-      
+
       <main className="flex-1 w-full flex flex-col pb-20">
-        
+
         {/* Cover Photo */}
         <section className="relative w-full h-[320px] md:h-[400px]">
           <div
@@ -58,14 +58,14 @@ const EmployerProfilePage = () => {
 
         {/* Floating Content Area */}
         <div className="relative z-20 max-w-[1280px] w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-[80px]">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
+
             {/* LEFT COLUMN: Company Info */}
             <div className="lg:col-span-4 lg:col-start-1 flex flex-col gap-6">
-              
+
               <div className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col items-center sm:items-start text-center sm:text-left">
-                
+
                 {/* Logo */}
                 <div className="w-32 h-32 rounded-2xl p-2 bg-white border border-gray-100 shadow-md -mt-16 mb-5 shrink-0 relative flex items-center justify-center overflow-hidden">
                   <img src={company.logo} alt={company.name} className="w-full object-contain" />
@@ -73,7 +73,7 @@ const EmployerProfilePage = () => {
 
                 <h1 className="text-2xl md:text-3xl font-black font-display text-gray-900 mb-2">{company.name}</h1>
                 <p className="text-[15px] font-medium text-indigo-600 mb-6">{company.industry}</p>
-                
+
                 <div className="w-full flex gap-3 mb-6">
                   <button className="flex-1 bg-linear-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white py-3 rounded-xl text-sm font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-transform hover:-translate-y-0.5">
                     <Heart size={18} />
@@ -106,7 +106,7 @@ const EmployerProfilePage = () => {
                       </a>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-3">
                     <Mail className="text-gray-400 mt-0.5 shrink-0" size={18} />
                     <div className="flex flex-col">
@@ -140,7 +140,7 @@ const EmployerProfilePage = () => {
 
             {/* RIGHT COLUMN: About & Jobs */}
             <div className="lg:col-span-8 flex flex-col gap-6">
-              
+
               {/* About Section */}
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100">
                 <h3 className="text-xl font-bold font-display text-gray-900 mb-5 pb-2 flex items-center gap-3">
@@ -155,8 +155,8 @@ const EmployerProfilePage = () => {
                   {/* Culture */}
                   <div>
                     <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                       <CheckCircle2 size={18} className="text-indigo-500" />
-                       Văn hóa nổi bật
+                      <CheckCircle2 size={18} className="text-indigo-500" />
+                      Văn hóa nổi bật
                     </h4>
                     <ul className="flex flex-col gap-3">
                       {company.culture.map((item, idx) => (
@@ -171,8 +171,8 @@ const EmployerProfilePage = () => {
                   {/* Benefits */}
                   <div>
                     <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                       <Award size={18} className="text-purple-500" />
-                       Phúc lợi nhân viên
+                      <Award size={18} className="text-purple-500" />
+                      Phúc lợi nhân viên
                     </h4>
                     <ul className="flex flex-col gap-3">
                       {company.benefits.map((item, idx) => (
@@ -198,7 +198,7 @@ const EmployerProfilePage = () => {
                     <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                   </a>
                 </div>
-                
+
                 <div className="flex flex-col gap-4">
                   {company.jobs.map(job => (
                     <div key={job.id} className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-slate-50 transition-colors group cursor-pointer">
@@ -243,4 +243,4 @@ function Award({ size, className }: { size: number, className?: string }) {
   );
 }
 
-export default EmployerProfilePage;
+export default RecruiterProfilePage;

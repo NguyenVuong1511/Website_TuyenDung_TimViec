@@ -54,9 +54,10 @@ const LoginPage = () => {
       const user = await loginApi({ email: email.trim(), password }, remember);
 
       // Điều hướng theo role
-      if (user.role === 'employer') {
-        navigate('/employer/dashboard');
-      } else if (user.role === 'admin') {
+      const lowerRole = user.role.toLowerCase();
+      if (lowerRole === 'recruiter' || lowerRole === 'recruiter') {
+        navigate('/recruiter/dashboard');
+      } else if (lowerRole === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/');

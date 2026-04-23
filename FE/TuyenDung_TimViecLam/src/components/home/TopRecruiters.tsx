@@ -16,7 +16,7 @@ const companies = [
 // Combine the array twice to create a seamless infinite scrolling loop effect
 const extendedCompanies = [...companies, ...companies];
 
-const TopEmployers = () => {
+const TopRecruiters = () => {
     return (
         <section className="w-full bg-slate-50 py-16 md:py-24 font-sans overflow-hidden">
             <style>
@@ -54,8 +54,8 @@ const TopEmployers = () => {
             <div className="w-full relative mask-edges max-w-[1400px] mx-auto mb-12">
                 <div className="flex gap-5 w-max animate-marquee py-4">
                     {extendedCompanies.map((c, index) => (
-                        <div 
-                            key={index} 
+                        <div
+                            key={index}
                             className="flex items-center gap-4 bg-white px-6 py-4 rounded-2xl border border-gray-100 shadow-[0_2px_15px_rgb(0,0,0,0.03)] hover:shadow-md hover:border-indigo-100 transition-all min-w-[200px] shrink-0 cursor-pointer"
                         >
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${c.bg} ${c.color}`}>
@@ -79,4 +79,4 @@ const TopEmployers = () => {
     );
 };
 
-export default TopEmployers;
+export default TopRecruiters;

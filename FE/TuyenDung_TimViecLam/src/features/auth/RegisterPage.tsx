@@ -31,7 +31,7 @@ const RegisterPage = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
-  const [role, setRole] = useState<'candidate' | 'employer'>('candidate');
+  const [role, setRole] = useState<'candidate' | 'recruiter'>('candidate');
 
   // Redirect nếu đã đăng nhập
   useEffect(() => {
@@ -84,7 +84,7 @@ const RegisterPage = () => {
   };
 
   // ── Reset lỗi khi đổi role ────────────────────────────────────────────────
-  const handleRoleChange = (r: 'candidate' | 'employer') => {
+  const handleRoleChange = (r: 'candidate' | 'recruiter') => {
     setRole(r);
     setError('');
     setSuccessMsg('');
@@ -97,7 +97,7 @@ const RegisterPage = () => {
     if (password.length < 6) { showError('Mật khẩu phải có ít nhất 6 ký tự.', passwordRef); return false; }
     if (password !== confirmPassword) { showError('Xác nhận mật khẩu không khớp.', confirmPasswordRef); return false; }
     if (role === 'candidate' && !fullName.trim()) { showError('Vui lòng nhập họ và tên.', fullNameRef); return false; }
-    if (role === 'employer' && !companyName.trim()) { showError('Vui lòng nhập tên công ty.', companyNameRef); return false; }
+    if (role === 'recruiter' && !companyName.trim()) { showError('Vui lòng nhập tên công ty.', companyNameRef); return false; }
     if (!agreed) { showError('Bạn cần đồng ý với điều khoản dịch vụ.'); return false; }
     return true;
   };
@@ -186,12 +186,12 @@ const RegisterPage = () => {
 
           <div className="z-10">
             <h2 className="text-3xl font-black text-white leading-tight mb-4">
-              {role === 'employer'
+              {role === 'recruiter'
                 ? <> Tìm kiếm<br />nhân tài!</>
                 : <> Chào mừng bạn<br />đến với UpWork</>}
             </h2>
             <p className="text-white/70 text-sm leading-relaxed">
-              {role === 'employer'
+              {role === 'recruiter'
                 ? 'Đăng tin tuyển dụng, quản lý hồ sơ ứng viên và xây dựng đội ngũ vững mạnh.'
                 : 'Cùng xây dựng hồ sơ nổi bật và nhận cơ hội sự nghiệp lý tưởng dành cho bạn.'}
             </p>
@@ -220,7 +220,7 @@ const RegisterPage = () => {
 
           {/* Role Switcher */}
           <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            {(['candidate', 'employer'] as const).map((r) => (
+            {(['candidate', 'recruiter'] as const).map((r) => (
               <button key={r} onClick={() => handleRoleChange(r)}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${role === r
                   ? 'bg-white text-indigo-600 shadow-sm'
@@ -353,7 +353,7 @@ const RegisterPage = () => {
             )}
 
             {/* ── Hồ sơ Nhà tuyển dụng ── */}
-            {role === 'employer' && (
+            {role === 'recruiter' && (
               <>
                 <SectionDivider title="Thông tin công ty" />
 
