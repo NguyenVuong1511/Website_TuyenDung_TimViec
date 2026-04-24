@@ -1,6 +1,7 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
+import JobListPage from './pages/JobListPage'
 import ProfilePage from './pages/ProfilePage'
 import RecruiterProfilePage from './pages/RecruiterProfilePage'
 import SettingsPage from './pages/SettingsPage'
@@ -12,6 +13,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/jobs" element={<JobListPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/recruiter-profile" element={<RecruiterProfilePage />} />
         <Route path="/settings" element={<SettingsPage />} />

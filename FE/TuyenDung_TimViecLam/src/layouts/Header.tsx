@@ -64,10 +64,10 @@ const Header = () => {
 
           {/* Navigation - Desktop */}
           <nav className="hidden lg:flex items-center gap-6">
-            <a href="#" className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors font-sans group">
+            <Link to="/jobs" className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors font-sans group">
               Việc làm
               <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
-            </a>
+            </Link>
             <a href="#" className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors font-sans group">
               Hồ sơ CV
               <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />

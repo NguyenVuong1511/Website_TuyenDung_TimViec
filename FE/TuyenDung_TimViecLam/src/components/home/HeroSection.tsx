@@ -13,7 +13,7 @@ const HeroSection = () => {
                     }}
                 >
                     {/* Dark Blue / Slate Overlay */}
-                    <div className="absolute inset-0 bg-slate-900/90" />
+                    <div className="absolute inset-0 bg-slate-800/70" />
                 </div>
 
                 {/* Hero Text Content */}

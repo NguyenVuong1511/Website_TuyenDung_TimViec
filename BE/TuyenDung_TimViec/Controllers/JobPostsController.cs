@@ -19,7 +19,7 @@ namespace TuyenDung_TimViec.Controllers
         {
             try
             {
-                var jobs = await _jobPostRepository.GetTopJobPostsAsync(9);
+                var jobs = await _jobPostRepository.GetTopJobPostsAsync(12);
                 return Ok(RepositoryResult<object>.Ok(jobs, "Lấy danh sách top jobs thành công!"));
             }
             catch (Exception ex)
