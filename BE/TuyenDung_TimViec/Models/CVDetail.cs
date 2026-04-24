@@ -10,6 +10,18 @@ namespace TuyenDung_TimViec.Models
         public DateTime? UploadDate { get; set; }
         public bool IsDefault { get; set; }
 
+        // Candidate Info
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string Avatar { get; set; }
+        public string AboutMe { get; set; }
+        public string Github { get; set; }
+        public string LinkedIn { get; set; }
+        public string Website { get; set; }
+
         public List<CVEducation> Educations { get; set; } = new List<CVEducation>();
         public List<CVExperience> Experiences { get; set; } = new List<CVExperience>();
         public List<CVSkill> Skills { get; set; } = new List<CVSkill>();

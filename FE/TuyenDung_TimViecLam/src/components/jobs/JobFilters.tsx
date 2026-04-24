@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Briefcase, ChevronDown, Filter, X, DollarSign, Award, Clock } from 'lucide-react';
+import { Search, MapPin, Briefcase, ChevronDown, Filter, X, DollarSign, Award } from 'lucide-react';
 import { getCategories } from '../../services/categoriesService';
 import type { Category } from '../../types/categories';
 

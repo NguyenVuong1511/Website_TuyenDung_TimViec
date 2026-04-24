@@ -26,11 +26,15 @@ namespace TuyenDung_TimViec.Repositories
             {
                 await connection.OpenAsync();
 
-                // 1. Get the CV (Join with Candidates to filter by UserId)
+                // 1. Get the Candidate Info and their default/latest CV
                 string queryCV = @"
-                    SELECT TOP 1 cv.* 
-                    FROM CVs cv
-                    INNER JOIN Candidates c ON cv.CandidateId = c.Id
+                    SELECT TOP 1 
+                           c.Id as CandidateId, c.FullName, c.Phone, c.Address, c.DateOfBirth, c.Avatar, c.AboutMe, c.Github, c.LinkedIn, c.Website,
+                           u.Email,
+                           cv.Id as CVId, cv.Title, cv.Type, cv.FileUrl, cv.UploadDate, cv.IsDefault
+                    FROM Candidates c
+                    INNER JOIN Users u ON c.UserId = u.Id
+                    LEFT JOIN CVs cv ON c.Id = cv.CandidateId
                     WHERE c.UserId = @UserId 
                     ORDER BY cv.IsDefault DESC, cv.UploadDate DESC";
 
@@ -43,19 +47,42 @@ namespace TuyenDung_TimViec.Repositories
                         {
                             cv = new CVDetail
                             {
-                                Id = reader.GetGuid(reader.GetOrdinal("Id")),
                                 CandidateId = reader.GetGuid(reader.GetOrdinal("CandidateId")),
-                                Title = reader.IsDBNull(reader.GetOrdinal("Title")) ? string.Empty : reader.GetString(reader.GetOrdinal("Title")),
-                                Type = reader.IsDBNull(reader.GetOrdinal("Type")) ? string.Empty : reader.GetString(reader.GetOrdinal("Type")),
-                                FileUrl = reader.IsDBNull(reader.GetOrdinal("FileUrl")) ? string.Empty : reader.GetString(reader.GetOrdinal("FileUrl")),
-                                UploadDate = reader.IsDBNull(reader.GetOrdinal("UploadDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("UploadDate")),
-                                IsDefault = reader.IsDBNull(reader.GetOrdinal("IsDefault")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDefault"))
+                                FullName = reader.IsDBNull(reader.GetOrdinal("FullName")) ? string.Empty : reader.GetString(reader.GetOrdinal("FullName")),
+                                Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? string.Empty : reader.GetString(reader.GetOrdinal("Email")),
+                                Phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? string.Empty : reader.GetString(reader.GetOrdinal("Phone")),
+                                Address = reader.IsDBNull(reader.GetOrdinal("Address")) ? string.Empty : reader.GetString(reader.GetOrdinal("Address")),
+                                DateOfBirth = reader.IsDBNull(reader.GetOrdinal("DateOfBirth")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateOfBirth")),
+                                Avatar = reader.IsDBNull(reader.GetOrdinal("Avatar")) ? string.Empty : reader.GetString(reader.GetOrdinal("Avatar")),
+                                AboutMe = reader.IsDBNull(reader.GetOrdinal("AboutMe")) ? string.Empty : reader.GetString(reader.GetOrdinal("AboutMe")),
+                                Github = reader.IsDBNull(reader.GetOrdinal("Github")) ? string.Empty : reader.GetString(reader.GetOrdinal("Github")),
+                                LinkedIn = reader.IsDBNull(reader.GetOrdinal("LinkedIn")) ? string.Empty : reader.GetString(reader.GetOrdinal("LinkedIn")),
+                                Website = reader.IsDBNull(reader.GetOrdinal("Website")) ? string.Empty : reader.GetString(reader.GetOrdinal("Website"))
                             };
+
+                            // Map CV info if exists
+                            if (!reader.IsDBNull(reader.GetOrdinal("CVId")))
+                            {
+                                cv.Id = reader.GetGuid(reader.GetOrdinal("CVId"));
+                                cv.Title = reader.IsDBNull(reader.GetOrdinal("Title")) ? string.Empty : reader.GetString(reader.GetOrdinal("Title"));
+                                cv.Type = reader.IsDBNull(reader.GetOrdinal("Type")) ? string.Empty : reader.GetString(reader.GetOrdinal("Type"));
+                                cv.FileUrl = reader.IsDBNull(reader.GetOrdinal("FileUrl")) ? string.Empty : reader.GetString(reader.GetOrdinal("FileUrl"));
+                                cv.UploadDate = reader.IsDBNull(reader.GetOrdinal("UploadDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("UploadDate"));
+                                cv.IsDefault = reader.IsDBNull(reader.GetOrdinal("IsDefault")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDefault"));
+                            }
+                            else
+                            {
+                                cv.Id = Guid.Empty;
+                            }
                         }
                     }
                 }
 
                 if (cv == null) return null;
+
+                // Only fetch child records if CVId is not empty
+                if (cv.Id != Guid.Empty)
+                {
 
                 // 2. Get Educations
                 string queryEdu = "SELECT * FROM CVEducations WHERE CVId = @CVId";
@@ -122,6 +149,7 @@ namespace TuyenDung_TimViec.Repositories
                         }
                     }
                 }
+                } // end if cv.Id != Guid.Empty
             }
 
             return cv;
