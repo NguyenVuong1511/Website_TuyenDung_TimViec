@@ -32,6 +32,11 @@ export async function uploadCVFile(userId: string, file: File): Promise<{ succes
   return data;
 }
 
+export async function deleteCVFile(userId: string): Promise<{ success: boolean; message: string }> {
+  const { data } = await axiosInstance.delete(`/api/Upload/cvfile/${userId}`);
+  return data;
+}
+
 export async function updateCVDetail(userId: string, cvData: CV): Promise<CVResponse> {
   const { data } = await axiosInstance.put<CVResponse>(`/cvs/user/${userId}`, cvData);
   return data;

@@ -198,5 +198,64 @@ namespace TuyenDung_TimViec.Controllers
                 return StatusCode(500, new { success = false, message = "Lỗi khi lưu file: " + ex.Message });
             }
         }
+
+        [HttpDelete("cvfile/{userId}")]
+        public async Task<IActionResult> DeleteCVFile(Guid userId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+
+                    // 1. Find the CandidateId
+                    Guid candidateId = Guid.Empty;
+                    using (SqlCommand findCmd = new SqlCommand("SELECT Id FROM Candidates WHERE UserId = @UserId", conn))
+                    {
+                        findCmd.Parameters.AddWithValue("@UserId", userId);
+                        var result = await findCmd.ExecuteScalarAsync();
+                        if (result != null) candidateId = (Guid)result;
+                    }
+
+                    if (candidateId == Guid.Empty)
+                        return NotFound(new { success = false, message = "Không tìm thấy ứng viên." });
+
+                    // 2. Get the filename to delete from disk
+                    string fileName = null;
+                    using (SqlCommand selectCmd = new SqlCommand("SELECT FileUrl FROM CVs WHERE CandidateId = @CandidateId AND IsDefault = 1", conn))
+                    {
+                        selectCmd.Parameters.AddWithValue("@CandidateId", candidateId);
+                        var result = await selectCmd.ExecuteScalarAsync();
+                        if (result != null && result != DBNull.Value) fileName = result.ToString();
+                    }
+
+                    if (string.IsNullOrEmpty(fileName))
+                        return BadRequest(new { success = false, message = "Không có file CV để xóa." });
+
+                    // 3. Clear FileUrl in DB
+                    using (SqlCommand updateCmd = new SqlCommand("UPDATE CVs SET FileUrl = NULL, UploadDate = NULL WHERE CandidateId = @CandidateId AND IsDefault = 1", conn))
+                    {
+                        updateCmd.Parameters.AddWithValue("@CandidateId", candidateId);
+                        await updateCmd.ExecuteNonQueryAsync();
+                    }
+
+                    // 4. Delete file from disk
+                    var beDir = _env.ContentRootPath;
+                    var feCvDir = Path.GetFullPath(Path.Combine(beDir, "..", "..", "FE", "TuyenDung_TimViecLam", "public", "cvs"));
+                    var filePath = Path.Combine(feCvDir, fileName);
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+
+                return Ok(new { success = true, message = "Xóa CV thành công." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi khi xóa file: " + ex.Message });
+            }
+        }
     }
 }

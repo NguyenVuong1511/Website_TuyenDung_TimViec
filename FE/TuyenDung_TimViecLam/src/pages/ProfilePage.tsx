@@ -5,7 +5,7 @@ import {
   Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap,
   PenLine, Camera, ExternalLink, Download, Loader2, X, FileText, Trash2
 } from 'lucide-react';
-import { getCVByUserId, uploadAvatar, updateCVDetail, uploadCVFile } from '../services/cvService';
+import { getCVByUserId, uploadAvatar, updateCVDetail, uploadCVFile, deleteCVFile } from '../services/cvService';
 import { getUserId } from '../services/authService';
 import type { CV } from '../types/cv';
 
@@ -111,6 +111,25 @@ const ProfilePage = () => {
       alert('Đã xảy ra lỗi khi tải CV lên.');
     } finally {
       setIsUploadingCv(false);
+    }
+  };
+
+  const handleDeleteCv = async () => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa file CV này không?')) return;
+
+    try {
+      const userId = getUserId();
+      if (!userId) return;
+
+      const response = await deleteCVFile(userId);
+      if (response.success) {
+        setCvData(prev => prev ? { ...prev, fileUrl: '', uploadDate: '' } : prev);
+        alert('Xóa CV thành công!');
+      } else {
+        alert('Lỗi khi xóa CV: ' + response.message);
+      }
+    } catch (err: any) {
+      alert('Đã xảy ra lỗi khi xóa CV.');
     }
   };
 
@@ -391,6 +410,14 @@ const ProfilePage = () => {
                           </span>
                         </div>
                       </div>
+
+                      <button
+                        onClick={handleDeleteCv}
+                        className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer opacity-0 group-hover/file:opacity-100"
+                        title="Xóa CV"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
