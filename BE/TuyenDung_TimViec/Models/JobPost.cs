@@ -1,4 +1,4 @@
-﻿namespace TuyenDung_TimViec.Models
+namespace TuyenDung_TimViec.Models
 {
     public class JobPost
     {
@@ -28,6 +28,7 @@
         public string CompanyLogo { get; set; }
         public string LocationName { get; set; }
         public string JobTypeName { get; set; }
-
+        public string ExperienceName { get; set; }
+        public string LevelName { get; set; }
     }
 }

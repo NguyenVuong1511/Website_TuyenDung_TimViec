@@ -21,6 +21,8 @@ export interface Job {
     companyLogo: string;
     locationName: string;
     jobTypeName: string;
+    levelName: string;
+    experienceName: string;
 }
 
 export interface JobResponse {
@@ -56,4 +58,19 @@ export interface Category {
     iconName: string;
     color: string;
     bgColor: string;
+}
+
+export interface Level {
+    id: string;
+    name: string;
+}
+
+export interface Experience {
+    id: string;
+    name: string;
+}
+
+export interface JobType {
+    id: string;
+    name: string;
 }

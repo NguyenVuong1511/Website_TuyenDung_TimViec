@@ -33,11 +33,16 @@ namespace TuyenDung_TimViec.Repositories
         {
             var jobPosts = new List<JobPost>();
             string query = @"
-                SELECT TOP (@count) jp.*, c.Name as CompanyName, c.Logo as CompanyLogo, l.Name as LocationName, jt.Name as JobTypeName
+                SELECT TOP (@count) jp.*, 
+                       c.Name as CompanyName, c.Logo as CompanyLogo, 
+                       l.Name as LocationName, jt.Name as JobTypeName,
+                       jl.Name as LevelName, el.Name as ExperienceName
                 FROM JobPosts jp
                 LEFT JOIN Companies c ON jp.CompanyId = c.Id
                 LEFT JOIN Locations l ON jp.LocationId = l.Id
                 LEFT JOIN JobTypes jt ON jp.JobTypeId = jt.Id
+                LEFT JOIN Levels jl ON jp.LevelId = jl.Id
+                LEFT JOIN Experiences el ON jp.ExperienceId = el.Id
                 ORDER BY jp.PostDate DESC";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -128,11 +133,16 @@ namespace TuyenDung_TimViec.Repositories
             string whereSql = whereClauses.Count > 0 ? "WHERE " + string.Join(" AND ", whereClauses) : "";
 
             string query = $@"
-                SELECT jp.*, c.Name as CompanyName, c.Logo as CompanyLogo, l.Name as LocationName, jt.Name as JobTypeName
+                SELECT jp.*, 
+                       c.Name as CompanyName, c.Logo as CompanyLogo, 
+                       l.Name as LocationName, jt.Name as JobTypeName,
+                       jl.Name as LevelName, el.Name as ExperienceName
                 FROM JobPosts jp
                 LEFT JOIN Companies c ON jp.CompanyId = c.Id
                 LEFT JOIN Locations l ON jp.LocationId = l.Id
                 LEFT JOIN JobTypes jt ON jp.JobTypeId = jt.Id
+                LEFT JOIN Levels jl ON jp.LevelId = jl.Id
+                LEFT JOIN Experiences el ON jp.ExperienceId = el.Id
                 {whereSql}
                 ORDER BY jp.PostDate DESC
                 OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
@@ -192,7 +202,9 @@ namespace TuyenDung_TimViec.Repositories
                 CompanyName = reader.IsDBNull(reader.GetOrdinal("CompanyName")) ? string.Empty : reader.GetString(reader.GetOrdinal("CompanyName")),
                 CompanyLogo = reader.IsDBNull(reader.GetOrdinal("CompanyLogo")) ? string.Empty : reader.GetString(reader.GetOrdinal("CompanyLogo")),
                 LocationName = reader.IsDBNull(reader.GetOrdinal("LocationName")) ? string.Empty : reader.GetString(reader.GetOrdinal("LocationName")),
-                JobTypeName = reader.IsDBNull(reader.GetOrdinal("JobTypeName")) ? string.Empty : reader.GetString(reader.GetOrdinal("JobTypeName"))
+                JobTypeName = reader.IsDBNull(reader.GetOrdinal("JobTypeName")) ? string.Empty : reader.GetString(reader.GetOrdinal("JobTypeName")),
+                LevelName = reader.IsDBNull(reader.GetOrdinal("LevelName")) ? string.Empty : reader.GetString(reader.GetOrdinal("LevelName")),
+                ExperienceName = reader.IsDBNull(reader.GetOrdinal("ExperienceName")) ? string.Empty : reader.GetString(reader.GetOrdinal("ExperienceName"))
             };
         }
     }

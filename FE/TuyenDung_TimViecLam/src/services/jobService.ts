@@ -5,6 +5,9 @@ import type {
     ApiResponse,
     JobParams,
     Category,
+    Level,
+    Experience,
+    JobType,
 } from '../types/job';
 
 // ─── Tiện ích Quản lý tin tuyển dụng ────────────────────────────────────────────────────
@@ -27,5 +30,30 @@ export async function getLocations() {
 export async function getFeaturedJobs() {
     // API này trả về data là mảng [Job] trực tiếp
     const { data } = await axiosInstance.get<ApiResponse<Job[]>>('/jobposts/top');
+    return data;
+}
+
+export async function toggleSavedJob(userId: string, jobPostId: string) {
+    const { data } = await axiosInstance.post<ApiResponse<boolean>>(`/savedjobs/toggle?userId=${userId}&jobPostId=${jobPostId}`);
+    return data;
+}
+
+export async function checkIsSaved(userId: string, jobPostId: string) {
+    const { data } = await axiosInstance.get<ApiResponse<boolean>>(`/savedjobs/check?userId=${userId}&jobPostId=${jobPostId}`);
+    return data;
+}
+
+export async function getLevels() {
+    const { data } = await axiosInstance.get<ApiResponse<Level[]>>('/metadata/levels');
+    return data;
+}
+
+export async function getExperiences() {
+    const { data } = await axiosInstance.get<ApiResponse<Experience[]>>('/metadata/experiences');
+    return data;
+}
+
+export async function getJobTypes() {
+    const { data } = await axiosInstance.get<ApiResponse<JobType[]>>('/metadata/jobtypes');
     return data;
 }

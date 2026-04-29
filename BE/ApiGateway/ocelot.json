@@ -78,7 +78,39 @@
         "Delete"
       ]
     },
-    // 5.JobPosts (Danh sách bài đăng)
+    // 5. SavedJobs (Lưu việc làm)
+    {
+      "DownstreamPathTemplate": "/api/savedjobs/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/savedjobs/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Delete"
+      ]
+    },
+    // 6. Metadata (Cấp bậc, Kinh nghiệm, Loại hình)
+    {
+      "DownstreamPathTemplate": "/api/metadata/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/metadata/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    // 7.JobPosts (Danh sách bài đăng)
     {
       "DownstreamPathTemplate": "/api/jobposts",
       "DownstreamScheme": "https",

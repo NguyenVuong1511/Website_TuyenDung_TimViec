@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, MapPin, ArrowRight, Briefcase, DollarSign, Clock } from 'lucide-react';
 import type { Job } from '../../types/job';
+import { getUserId } from '../../services/authService';
+import { toggleSavedJob, checkIsSaved } from '../../services/jobService';
 
 interface JobCardProps {
     job: Job;
@@ -10,6 +12,41 @@ interface JobCardProps {
 
 const JobCard = ({ job, index = 0 }: JobCardProps) => {
     const [failedImage, setFailedImage] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const userId = getUserId();
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            if (userId && job.id) {
+                try {
+                    const res = await checkIsSaved(userId, job.id);
+                    if (res.success) setIsSaved(res.data);
+                } catch (error) {
+                    console.error('Error checking saved status:', error);
+                }
+            }
+        };
+        checkStatus();
+    }, [userId, job.id]);
+
+    const handleToggleSave = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!userId) {
+            alert('Vui lòng đăng nhập để lưu việc làm!');
+            return;
+        }
+
+        try {
+            const res = await toggleSavedJob(userId, job.id);
+            if (res.success) {
+                setIsSaved(res.data);
+            }
+        } catch (error) {
+            console.error('Error toggling saved job:', error);
+        }
+    };
 
     const formatSalary = (min: number, max: number) => {
         if (!min && !max) return "Thỏa thuận";
@@ -86,8 +123,17 @@ const JobCard = ({ job, index = 0 }: JobCardProps) => {
                         </div>
                     </div>
                 </div>
-                <button className="w-10 h-10 rounded-full text-gray-300 hover:text-rose-500 flex items-center justify-center transition-all cursor-pointer">
-                    <Heart size={20} strokeWidth={2} />
+                <button 
+                    onClick={handleToggleSave}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                        isSaved ? 'text-rose-500 bg-rose-50 shadow-inner' : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50'
+                    }`}
+                >
+                    <Heart 
+                        size={20} 
+                        strokeWidth={2} 
+                        className={isSaved ? 'fill-rose-500' : ''} 
+                    />
                 </button>
             </div>
 
@@ -100,13 +146,22 @@ const JobCard = ({ job, index = 0 }: JobCardProps) => {
 
             {/* Tags */}
             <div className="flex flex-wrap items-center gap-2 mb-8">
-                <div className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold flex items-center gap-1.5 border border-blue-100">
-                    <Briefcase size={12} />
-                    {job.jobTypeName}
-                </div>
-                <div className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-600 text-[11px] font-bold border border-orange-100">
-                    Linh hoạt
-                </div>
+                {job.jobTypeName && (
+                    <div className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold flex items-center gap-1.5 border border-blue-100">
+                        <Briefcase size={12} />
+                        {job.jobTypeName}
+                    </div>
+                )}
+                {job.levelName && (
+                    <div className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-600 text-[11px] font-bold border border-orange-100">
+                        {job.levelName}
+                    </div>
+                )}
+                {!job.levelName && job.experienceName && (
+                    <div className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-600 text-[11px] font-bold border border-orange-100">
+                        {job.experienceName}
+                    </div>
+                )}
             </div>
 
             {/* Footer: Location & Salary */}
