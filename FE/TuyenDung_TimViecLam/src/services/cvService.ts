@@ -19,6 +19,19 @@ export async function uploadAvatar(userId: string, file: File): Promise<{ succes
   return data;
 }
 
+export async function uploadCVFile(userId: string, file: File): Promise<{ success: boolean; message: string; data?: string }> {
+  const formData = new FormData();
+  formData.append('userId', userId);
+  formData.append('file', file);
+
+  const { data } = await axiosInstance.post('/api/Upload/cvfile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return data;
+}
+
 export async function updateCVDetail(userId: string, cvData: CV): Promise<CVResponse> {
   const { data } = await axiosInstance.put<CVResponse>(`/cvs/user/${userId}`, cvData);
   return data;

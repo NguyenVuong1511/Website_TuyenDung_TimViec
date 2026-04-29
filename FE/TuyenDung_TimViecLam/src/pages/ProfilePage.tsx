@@ -3,9 +3,9 @@ import Header from '../layouts/Header';
 import Footer from '../layouts/Footer';
 import {
   Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap,
-  PenLine, Camera, ExternalLink, Download, Loader2, X
+  PenLine, Camera, ExternalLink, Download, Loader2, X, FileText, Trash2
 } from 'lucide-react';
-import { getCVByUserId, uploadAvatar, updateCVDetail } from '../services/cvService';
+import { getCVByUserId, uploadAvatar, updateCVDetail, uploadCVFile } from '../services/cvService';
 import { getUserId } from '../services/authService';
 import type { CV } from '../types/cv';
 
@@ -16,7 +16,7 @@ const ProfilePage = () => {
 
   // Edit Modals State
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Basic Info
   const [isBasicInfoModalOpen, setIsBasicInfoModalOpen] = useState(false);
   const [draftBasicInfo, setDraftBasicInfo] = useState<Partial<CV>>({});
@@ -43,6 +43,12 @@ const ProfilePage = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // CV File upload state
+  const [isCvModalOpen, setIsCvModalOpen] = useState(false);
+  const [selectedCvFile, setSelectedCvFile] = useState<File | null>(null);
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
+  const cvFileInputRef = useRef<HTMLInputElement>(null);
 
   const closeAvatarModal = () => {
     setIsAvatarModalOpen(false);
@@ -84,6 +90,30 @@ const ProfilePage = () => {
     }
   };
 
+  const handleUploadCv = async () => {
+    if (!selectedCvFile) return;
+
+    setIsUploadingCv(true);
+    try {
+      const userId = getUserId();
+      if (!userId) return;
+
+      const response = await uploadCVFile(userId, selectedCvFile);
+      if (response.success && response.data) {
+        setCvData(prev => prev ? { ...prev, fileUrl: response.data as string, uploadDate: new Date().toISOString() } : prev);
+        setIsCvModalOpen(false);
+        setSelectedCvFile(null);
+        alert('Tải CV thành công!');
+      } else {
+        alert('Lỗi tải file: ' + response.message);
+      }
+    } catch (err: any) {
+      alert('Đã xảy ra lỗi khi tải CV lên.');
+    } finally {
+      setIsUploadingCv(false);
+    }
+  };
+
   const handleSaveSection = async (dataToUpdate: Partial<CV>, closeAction: () => void) => {
     if (!cvData) return;
     const userId = getUserId();
@@ -95,7 +125,7 @@ const ProfilePage = () => {
 
       // Clean empty string dates to null to prevent ASP.NET Core binding errors
       const sanitizeDate = (dateVal: any) => dateVal === '' ? null : dateVal;
-      
+
       const payload: any = {
         ...updatedCv,
         dateOfBirth: sanitizeDate(updatedCv.dateOfBirth),
@@ -223,7 +253,7 @@ const ProfilePage = () => {
 
               {/* Profile Card */}
               <div className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col items-center text-center group relative">
-                <button 
+                <button
                   onClick={() => {
                     setDraftBasicInfo({
                       fullName: cvData?.fullName || '',
@@ -270,15 +300,6 @@ const ProfilePage = () => {
                 <h2 className="text-2xl font-black font-display text-gray-900 mb-1 leading-tight">{displayName} {cvData?.gender === 'Nam' ? '♂️' : cvData?.gender === 'Nữ' ? '♀️' : cvData?.gender === 'Khác' ? '⚧️' : ''}</h2>
                 <p className="text-[15px] font-medium text-indigo-600 mb-5">{displayTitle}</p>
 
-                <div className="w-full flex gap-3 mb-6">
-                  <button className="flex-1 bg-linear-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-indigo-200 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer">
-                    <Download size={16} />
-                    Tải CV
-                  </button>
-                  <button className="w-11 h-11 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl flex items-center justify-center transition-colors border border-gray-200 cursor-pointer text-sm font-bold">
-                    Share
-                  </button>
-                </div>
 
                 {/* Divider */}
                 <div className="w-full h-px bg-gray-100 mb-6"></div>
@@ -343,6 +364,76 @@ const ProfilePage = () => {
 
               </div>
 
+              {/* CV File Management Section - NEW */}
+              <div className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col group relative">
+                <h3 className="text-lg font-bold font-display text-gray-900 mb-4 flex items-center gap-2">
+                  <FileText size={20} className="text-indigo-600" />
+                  CV đã tải lên
+                </h3>
+
+                {cvData?.fileUrl ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-4 group/file relative">
+                      <div className="w-12 h-12 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0 shadow-sm border border-red-100">
+                        <FileText size={24} />
+                      </div>
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="text-sm font-bold text-gray-800 truncate pr-8" title={cvData.fileUrl}>
+                          {'CV'}
+                        </span>
+                        <span className="text-[12px] text-gray-500 mt-0.5">
+                          Ngày tải: {cvData.uploadDate ? new Date(cvData.uploadDate).toLocaleDateString('vi-VN') : 'N/A'}
+                        </span>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase tracking-wider">Mặc định</span>
+                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wider">
+                            {cvData.fileUrl.split('.').pop()?.toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <a
+                        href={`/cvs/${cvData.fileUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-colors"
+                      >
+                        <ExternalLink size={16} />
+                        Xem CV
+                      </a>
+                      <button
+                        onClick={() => setIsCvModalOpen(true)}
+                        className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-50 text-indigo-600 text-sm font-bold hover:bg-indigo-100 transition-colors cursor-pointer"
+                      >
+                        <PenLine size={16} />
+                        Đổi file
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-center py-6 px-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-slate-300 mb-3 shadow-sm">
+                      <FileText size={32} />
+                    </div>
+                    <p className="text-sm font-semibold text-gray-500 mb-4">Bạn chưa tải file CV lên hệ thống</p>
+                    <button
+                      onClick={() => setIsCvModalOpen(true)}
+                      className="bg-linear-to-r from-purple-500 to-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-sm shadow-indigo-100 cursor-pointer"
+                    >
+                      Tải CV ngay
+                    </button>
+                  </div>
+                )}
+
+                <div className="mt-4 pt-4 border-t border-gray-50">
+                  <p className="text-[11px] text-gray-400 italic">
+                    * File CV sẽ được sử dụng để ứng tuyển vào các công việc bạn quan tâm.
+                  </p>
+                </div>
+              </div>
+
             </div>
 
             {/* RIGHT COLUMN: Main Content Sections */}
@@ -350,7 +441,7 @@ const ProfilePage = () => {
 
               {/* Introduction Section */}
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 group relative">
-                <button 
+                <button
                   onClick={() => {
                     setDraftAboutMe(cvData?.aboutMe || '');
                     setIsAboutMeModalOpen(true);
@@ -370,7 +461,7 @@ const ProfilePage = () => {
 
               {/* Experience Section */}
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 group relative">
-                <button 
+                <button
                   onClick={() => {
                     setDraftExperiences(cvData?.experiences || []);
                     setIsExperienceModalOpen(true);
@@ -418,7 +509,7 @@ const ProfilePage = () => {
 
                 {/* Education Section */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 group relative">
-                  <button 
+                  <button
                     onClick={() => {
                       setDraftEducations(cvData?.educations || []);
                       setIsEducationModalOpen(true);
@@ -453,7 +544,7 @@ const ProfilePage = () => {
 
                 {/* Skills Section */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 group relative">
-                  <button 
+                  <button
                     onClick={() => {
                       setDraftSkills(cvData?.skills || []);
                       setIsSkillsModalOpen(true);
@@ -559,23 +650,23 @@ const ProfilePage = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5 max-h-[70vh] overflow-y-auto">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">Họ và tên</label>
-                <input type="text" value={draftBasicInfo.fullName || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, fullName: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                <input type="text" value={draftBasicInfo.fullName || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, fullName: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">Chức danh</label>
-                <input type="text" value={draftBasicInfo.title || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, title: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                <input type="text" value={draftBasicInfo.title || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, title: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">Ngày sinh</label>
-                <input type="date" value={draftBasicInfo.dateOfBirth ? new Date(draftBasicInfo.dateOfBirth).toISOString().split('T')[0] : ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, dateOfBirth: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                <input type="date" value={draftBasicInfo.dateOfBirth ? new Date(draftBasicInfo.dateOfBirth).toISOString().split('T')[0] : ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, dateOfBirth: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">Giới tính</label>
-                <select value={draftBasicInfo.gender || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, gender: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white">
+                <select value={draftBasicInfo.gender || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, gender: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white">
                   <option value="">Chưa cập nhật</option>
                   <option value="Nam">Nam</option>
                   <option value="Nữ">Nữ</option>
@@ -584,26 +675,26 @@ const ProfilePage = () => {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">Số điện thoại</label>
-                <input type="text" value={draftBasicInfo.phone || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, phone: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                <input type="text" value={draftBasicInfo.phone || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, phone: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
               </div>
               <div className="flex flex-col gap-1.5 md:col-span-2">
                 <label className="text-sm font-semibold text-gray-700">Địa chỉ</label>
-                <input type="text" value={draftBasicInfo.address || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, address: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                <input type="text" value={draftBasicInfo.address || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, address: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
               </div>
               <div className="flex flex-col gap-1.5 md:col-span-2 mt-2">
                 <h4 className="font-semibold text-gray-800 border-b pb-2 mb-2">Liên kết mạng xã hội</h4>
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">GitHub</label>
-                <input type="text" value={draftBasicInfo.github || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, github: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="https://github.com/..." />
+                <input type="text" value={draftBasicInfo.github || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, github: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="https://github.com/..." />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-gray-700">LinkedIn</label>
-                <input type="text" value={draftBasicInfo.linkedIn || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, linkedIn: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="https://linkedin.com/in/..." />
+                <input type="text" value={draftBasicInfo.linkedIn || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, linkedIn: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="https://linkedin.com/in/..." />
               </div>
               <div className="flex flex-col gap-1.5 md:col-span-2">
                 <label className="text-sm font-semibold text-gray-700">Website cá nhân</label>
-                <input type="text" value={draftBasicInfo.website || ''} onChange={e => setDraftBasicInfo({...draftBasicInfo, website: e.target.value})} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="https://..." />
+                <input type="text" value={draftBasicInfo.website || ''} onChange={e => setDraftBasicInfo({ ...draftBasicInfo, website: e.target.value })} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="https://..." />
               </div>
             </div>
 
@@ -631,7 +722,7 @@ const ProfilePage = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 flex flex-col">
               <label className="text-sm font-semibold text-gray-700 mb-2">Thông tin giới thiệu</label>
               <textarea
@@ -679,11 +770,11 @@ const ProfilePage = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto bg-gray-50/30">
               {draftExperiences.map((exp, index) => (
                 <div key={exp.id || index} className="bg-white p-5 border border-gray-200 rounded-xl relative shadow-sm">
-                  <button 
+                  <button
                     onClick={() => setDraftExperiences(draftExperiences.filter((_, i) => i !== index))}
                     className="absolute top-5 right-5 text-gray-400 hover:text-red-500 p-1 bg-gray-50 rounded-md transition-colors cursor-pointer"
                   >
@@ -713,9 +804,9 @@ const ProfilePage = () => {
                   </div>
                 </div>
               ))}
-              
-              <button 
-                onClick={() => setDraftExperiences([...draftExperiences, { id: crypto.randomUUID(), cvId: cvData?.id || '00000000-0000-0000-0000-000000000000', companyName: '', position: '', startDate: '', endDate: null, description: '' }])} 
+
+              <button
+                onClick={() => setDraftExperiences([...draftExperiences, { id: crypto.randomUUID(), cvId: cvData?.id || '00000000-0000-0000-0000-000000000000', companyName: '', position: '', startDate: '', endDate: null, description: '' }])}
                 className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 + Thêm kinh nghiệm làm việc
@@ -742,11 +833,11 @@ const ProfilePage = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto bg-gray-50/30">
               {draftEducations.map((edu, index) => (
                 <div key={edu.id || index} className="bg-white p-5 border border-gray-200 rounded-xl relative shadow-sm">
-                  <button 
+                  <button
                     onClick={() => setDraftEducations(draftEducations.filter((_, i) => i !== index))}
                     className="absolute top-5 right-5 text-gray-400 hover:text-red-500 p-1 bg-gray-50 rounded-md transition-colors cursor-pointer"
                   >
@@ -776,9 +867,9 @@ const ProfilePage = () => {
                   </div>
                 </div>
               ))}
-              
-              <button 
-                onClick={() => setDraftEducations([...draftEducations, { id: crypto.randomUUID(), cvId: cvData?.id || '00000000-0000-0000-0000-000000000000', schoolName: '', major: '', startDate: '', endDate: '', description: '' }])} 
+
+              <button
+                onClick={() => setDraftEducations([...draftEducations, { id: crypto.randomUUID(), cvId: cvData?.id || '00000000-0000-0000-0000-000000000000', schoolName: '', major: '', startDate: '', endDate: '', description: '' }])}
                 className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 + Thêm học vấn
@@ -805,7 +896,7 @@ const ProfilePage = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
               {draftSkills.map((skill, index) => (
                 <div key={skill.id || index} className="flex gap-3 items-center">
@@ -826,9 +917,9 @@ const ProfilePage = () => {
                   </button>
                 </div>
               ))}
-              
-              <button 
-                onClick={() => setDraftSkills([...draftSkills, { id: crypto.randomUUID(), cvId: cvData?.id || '00000000-0000-0000-0000-000000000000', skillName: '', level: 'Cơ bản' }])} 
+
+              <button
+                onClick={() => setDraftSkills([...draftSkills, { id: crypto.randomUUID(), cvId: cvData?.id || '00000000-0000-0000-0000-000000000000', skillName: '', level: 'Cơ bản' }])}
                 className="w-full py-3 mt-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 + Thêm kỹ năng
@@ -839,6 +930,80 @@ const ProfilePage = () => {
               <button onClick={() => setIsSkillsModalOpen(false)} disabled={isSaving} className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer">Hủy bỏ</button>
               <button onClick={handleSaveSkills} disabled={isSaving} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-linear-to-r from-purple-500 to-blue-500 hover:opacity-90 shadow-sm shadow-indigo-200 transition-all cursor-pointer flex items-center gap-2">
                 {isSaving ? <><Loader2 size={16} className="animate-spin" />Đang lưu...</> : 'Lưu thay đổi'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload CV Modal */}
+      {isCvModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-lg font-bold text-gray-900 font-display">Tải lên CV mới</h3>
+              <button
+                onClick={() => setIsCvModalOpen(false)}
+                disabled={isUploadingCv}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-8 flex flex-col items-center">
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+                ref={cvFileInputRef}
+                onChange={(e) => e.target.files && setSelectedCvFile(e.target.files[0])}
+              />
+
+              <div
+                onClick={() => cvFileInputRef.current?.click()}
+                className={`w-full py-10 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer ${selectedCvFile ? 'border-green-400 bg-green-50' : 'border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/50'
+                  }`}
+              >
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-sm ${selectedCvFile ? 'bg-white text-green-500' : 'bg-white text-slate-400'
+                  }`}>
+                  <FileText size={32} />
+                </div>
+                {selectedCvFile ? (
+                  <div className="text-center px-4">
+                    <p className="text-sm font-bold text-gray-800 truncate max-w-[250px]">{selectedCvFile.name}</p>
+                    <p className="text-[12px] text-gray-500">{(selectedCvFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm font-bold text-gray-700">Nhấp để chọn hoặc kéo thả file</p>
+                    <p className="text-[12px] text-gray-500 mt-1">PDF, DOC, DOCX (Tối đa 5MB)</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex gap-3 justify-end">
+              <button
+                onClick={() => setIsCvModalOpen(false)}
+                disabled={isUploadingCv}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleUploadCv}
+                disabled={isUploadingCv || !selectedCvFile}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-linear-to-r from-purple-500 to-blue-500 hover:opacity-90 shadow-sm shadow-indigo-200 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUploadingCv ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Đang tải lên...
+                  </>
+                ) : (
+                  'Bắt đầu tải lên'
+                )}
               </button>
             </div>
           </div>

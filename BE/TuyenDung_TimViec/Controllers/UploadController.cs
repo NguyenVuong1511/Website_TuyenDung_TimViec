@@ -25,7 +25,7 @@ namespace TuyenDung_TimViec.Controllers
             try
             {
                 // Construct path to FE/TuyenDung_TimViecLam/public/images/avatar
-                var beDir = _env.ContentRootPath; // f:\SPKTHY_3\DoAn_3\Website_TuyenDung_TimViec\BE\TuyenDung_TimViec
+                var beDir = _env.ContentRootPath;
                 var feAvatarDir = Path.GetFullPath(Path.Combine(beDir, "..", "..", "FE", "TuyenDung_TimViecLam", "public", "images", "avatar"));
 
                 if (!Directory.Exists(feAvatarDir))
@@ -98,6 +98,104 @@ namespace TuyenDung_TimViec.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = "Lỗi khi lưu ảnh: " + ex.Message });
+            }
+        }
+
+        [HttpPost("cvfile")]
+        public async Task<IActionResult> UploadCVFile([FromForm] IFormFile file, [FromForm] Guid userId)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { success = false, message = "Không có file được chọn." });
+
+            try
+            {
+                // Construct path to FE/TuyenDung_TimViecLam/public/cvs
+                var beDir = _env.ContentRootPath;
+                var feCvDir = Path.GetFullPath(Path.Combine(beDir, "..", "..", "FE", "TuyenDung_TimViecLam", "public", "cvs"));
+
+                if (!Directory.Exists(feCvDir))
+                {
+                    Directory.CreateDirectory(feCvDir);
+                }
+
+                // Create a unique filename
+                var fileExtension = Path.GetExtension(file.FileName);
+                var fileName = $"CV_{userId}_{DateTime.Now.Ticks}{fileExtension}";
+                var filePath = Path.Combine(feCvDir, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Update CVs table in DB and delete old file
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    
+                    // 1. Find the CandidateId first
+                    Guid candidateId = Guid.Empty;
+                    using (SqlCommand findCmd = new SqlCommand("SELECT Id FROM Candidates WHERE UserId = @UserId", conn))
+                    {
+                        findCmd.Parameters.AddWithValue("@UserId", userId);
+                        var result = await findCmd.ExecuteScalarAsync();
+                        if (result != null) candidateId = (Guid)result;
+                    }
+
+                    if (candidateId != Guid.Empty)
+                    {
+                        // 2. Get old file to delete
+                        string oldFile = null;
+                        using (SqlCommand selectCmd = new SqlCommand("SELECT FileUrl FROM CVs WHERE CandidateId = @CandidateId AND IsDefault = 1", conn))
+                        {
+                            selectCmd.Parameters.AddWithValue("@CandidateId", candidateId);
+                            var result = await selectCmd.ExecuteScalarAsync();
+                            if (result != null && result != DBNull.Value) oldFile = result.ToString();
+                        }
+
+                        // 3. Update DB
+                        var updateQuery = "UPDATE CVs SET FileUrl = @FileUrl, UploadDate = @UploadDate WHERE CandidateId = @CandidateId AND IsDefault = 1";
+                        using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                        {
+                            updateCmd.Parameters.AddWithValue("@FileUrl", fileName);
+                            updateCmd.Parameters.AddWithValue("@UploadDate", DateTime.Now);
+                            updateCmd.Parameters.AddWithValue("@CandidateId", candidateId);
+                            int rowsAffected = await updateCmd.ExecuteNonQueryAsync();
+
+                            if (rowsAffected == 0)
+                            {
+                                // If no default CV, insert one
+                                var insertQuery = "INSERT INTO CVs (Id, CandidateId, FileUrl, UploadDate, IsDefault, Title, Type) VALUES (@Id, @CandidateId, @FileUrl, @UploadDate, 1, @Title, @Type)";
+                                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                                {
+                                    insertCmd.Parameters.AddWithValue("@Id", Guid.NewGuid());
+                                    insertCmd.Parameters.AddWithValue("@CandidateId", candidateId);
+                                    insertCmd.Parameters.AddWithValue("@FileUrl", fileName);
+                                    insertCmd.Parameters.AddWithValue("@UploadDate", DateTime.Now);
+                                    insertCmd.Parameters.AddWithValue("@Title", "Default CV");
+                                    insertCmd.Parameters.AddWithValue("@Type", "Uploaded");
+                                    await insertCmd.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
+
+                        // 4. Delete old file
+                        if (!string.IsNullOrEmpty(oldFile))
+                        {
+                            var oldFilePath = Path.Combine(feCvDir, oldFile);
+                            if (System.IO.File.Exists(oldFilePath))
+                            {
+                                try { System.IO.File.Delete(oldFilePath); } catch { }
+                            }
+                        }
+                    }
+                }
+
+                return Ok(new { success = true, message = "Tải CV thành công.", data = fileName });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi khi lưu file: " + ex.Message });
             }
         }
     }
