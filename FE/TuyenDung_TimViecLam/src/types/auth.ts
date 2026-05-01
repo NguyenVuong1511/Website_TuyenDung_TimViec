@@ -36,10 +36,43 @@ export interface RegisterRecruiterRequest {
   companyDescription?: string;
 }
 
+// ─── Account Management ───────────────────────────────────────────────────────
+
+export interface ChangePasswordRequest {
+  userId: string;
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface ChangeEmailRequest {
+  userId: string;
+  newEmail: string;
+  password: string;
+}
+
+export interface UpdateProfileRequest {
+  userId: string;
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  companyName?: string;
+  companyAddress?: string;
+  companyWebsite?: string;
+}
+
+export interface AccountInfo {
+  userId: string;
+  email: string;
+  role: string;
+  fullName?: string;
+  phone?: string;
+  companyName?: string;
+}
+
 // ─── Phản hồi chung từ API ────────────────────────────────────────────────────
 
-export interface ApiResponse<T = null> {
+export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
-  data?: T;
+  data: T;
 }

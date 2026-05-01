@@ -79,5 +79,19 @@ namespace TuyenDung_TimViec.Controllers
                 return StatusCode(500, $"Lỗi hệ thống: {message}");
             }
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetJobById(Guid id)
+        {
+            try
+            {
+                var job = await _jobPostRepository.GetJobPostByIdAsync(id);
+                if (job == null) return NotFound(RepositoryResult<object>.Fail("Không tìm thấy việc làm này."));
+                return Ok(RepositoryResult<object>.Ok(job, "Lấy chi tiết việc làm thành công!"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
     }
 }

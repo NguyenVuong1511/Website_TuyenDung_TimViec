@@ -1,4 +1,4 @@
-﻿using IdentityService.Models;
+using IdentityService.Models;
 using Microsoft.Data.SqlClient;
 
 namespace IdentityService.Repositories 
@@ -183,6 +183,157 @@ namespace IdentityService.Repositories
                     }
                 }
             }
+        }
+
+        // 4. Đổi mật khẩu
+        public RepositoryResult<bool> ChangePassword(ChangePasswordRequest req)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Users SET Password = @newPass WHERE Id = @id AND Password = @oldPass";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", req.UserId);
+                    cmd.Parameters.AddWithValue("@oldPass", req.OldPassword);
+                    cmd.Parameters.AddWithValue("@newPass", req.NewPassword);
+
+                    conn.Open();
+                    int rows = cmd.ExecuteNonQuery();
+                    if (rows > 0) return RepositoryResult<bool>.Ok(true, "Đổi mật khẩu thành công.");
+                    return RepositoryResult<bool>.Fail("Mật khẩu cũ không chính xác.");
+                }
+            }
+        }
+
+        // 5. Đổi Email
+        public RepositoryResult<bool> ChangeEmail(ChangeEmailRequest req)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                // Check if new email already exists
+                string checkQuery = "SELECT COUNT(1) FROM Users WHERE Email = @email AND Id != @id";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@email", req.NewEmail);
+                    checkCmd.Parameters.AddWithValue("@id", req.UserId);
+                    if ((int)checkCmd.ExecuteScalar() > 0) return RepositoryResult<bool>.Fail("Email mới đã tồn tại.");
+                }
+
+                string query = "UPDATE Users SET Email = @newEmail WHERE Id = @id AND Password = @pass";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", req.UserId);
+                    cmd.Parameters.AddWithValue("@pass", req.Password);
+                    cmd.Parameters.AddWithValue("@newEmail", req.NewEmail);
+
+                    int rows = cmd.ExecuteNonQuery();
+                    if (rows > 0) return RepositoryResult<bool>.Ok(true, "Cập nhật email thành công.");
+                    return RepositoryResult<bool>.Fail("Mật khẩu không chính xác.");
+                }
+            }
+        }
+
+        // 6. Cập nhật thông tin Candidate
+        public RepositoryResult<bool> UpdateCandidateProfile(UpdateCandidateProfileRequest req)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Candidates SET FullName = @name, Phone = @phone, Address = @addr WHERE UserId = @userId";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", req.UserId);
+                    cmd.Parameters.AddWithValue("@name", req.FullName);
+                    cmd.Parameters.AddWithValue("@phone", (object)req.Phone ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@addr", (object)req.Address ?? DBNull.Value);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    return RepositoryResult<bool>.Ok(true, "Cập nhật thông tin thành công.");
+                }
+            }
+        }
+
+        // 7. Cập nhật thông tin Recruiter (Company info)
+        public RepositoryResult<bool> UpdateRecruiterProfile(UpdateRecruiterProfileRequest req)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string getCompanyIdQuery = "SELECT CompanyId FROM Recruiters WHERE UserId = @userId";
+                        Guid companyId = Guid.Empty;
+                        using (SqlCommand cmdGet = new SqlCommand(getCompanyIdQuery, conn, trans))
+                        {
+                            cmdGet.Parameters.AddWithValue("@userId", req.UserId);
+                            var res = cmdGet.ExecuteScalar();
+                            if (res != null) companyId = (Guid)res;
+                        }
+
+                        if (companyId != Guid.Empty)
+                        {
+                            string query = "UPDATE Companies SET Name = @name, Address = @addr, Website = @web WHERE Id = @companyId";
+                            using (SqlCommand cmd = new SqlCommand(query, conn, trans))
+                            {
+                                cmd.Parameters.AddWithValue("@companyId", companyId);
+                                cmd.Parameters.AddWithValue("@name", req.CompanyName);
+                                cmd.Parameters.AddWithValue("@addr", (object)req.CompanyAddress ?? DBNull.Value);
+                                cmd.Parameters.AddWithValue("@web", (object)req.CompanyWebsite ?? DBNull.Value);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        trans.Commit();
+                        return RepositoryResult<bool>.Ok(true, "Cập nhật thông tin công ty thành công.");
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return RepositoryResult<bool>.Fail("Lỗi: " + ex.Message);
+                    }
+                }
+            }
+        }
+
+        // 8. Lấy thông tin tài khoản
+        public RepositoryResult<AccountInfoResponse> GetAccountInfo(Guid userId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT u.Id, u.Email, u.Role, c.FullName, c.Phone, comp.Name as CompanyName
+                    FROM Users u
+                    LEFT JOIN Candidates c ON u.Id = c.UserId
+                    LEFT JOIN Recruiters r ON u.Id = r.UserId
+                    LEFT JOIN Companies comp ON r.CompanyId = comp.Id
+                    WHERE u.Id = @id";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", userId);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var info = new AccountInfoResponse
+                            {
+                                UserId = reader.GetGuid(0),
+                                Email = reader.GetString(1),
+                                Role = reader.GetString(2),
+                                FullName = reader.IsDBNull(3) ? null : reader.GetString(3),
+                                Phone = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                CompanyName = reader.IsDBNull(5) ? null : reader.GetString(5)
+                            };
+                            return RepositoryResult<AccountInfoResponse>.Ok(info, "Lấy thông tin thành công.");
+                        }
+                    }
+                }
+            }
+            return RepositoryResult<AccountInfoResponse>.Fail("Không tìm thấy người dùng.");
         }
     }
 }

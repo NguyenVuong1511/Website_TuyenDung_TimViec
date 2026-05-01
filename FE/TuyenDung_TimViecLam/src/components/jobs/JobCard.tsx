@@ -90,22 +90,25 @@ const JobCard = ({ job, index = 0 }: JobCardProps) => {
     ];
 
     return (
-        <div className="group relative bg-white rounded-3xl border border-gray-100 p-6 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-500 flex flex-col">
-            {/* Top: Logo & Meta */}
+        <div className="group relative bg-white rounded-[32px] border border-gray-100 p-6 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-500 flex flex-col h-full">
+            {/* Top: Logo & Save Button */}
             <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
+                <Link to={`/jobs/${job.id}`} className="flex items-center gap-4">
                     <div className="relative">
                         {job.companyLogo && !failedImage ? (
-                            <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center p-1">
+                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center p-1.5 shadow-sm group-hover:border-indigo-100 transition-colors">
                                 <img
-                                    src={getLogoUrl(job.companyLogo) || ''}
+                                    src={job.companyLogo ? `/images/${job.companyLogo}` : 'https://placehold.co/150x150?text=No+Logo'}
                                     alt={job.companyName}
-                                    className="w-full h-full object-contain"
-                                    onError={() => setFailedImage(true)}
+                                    className="w-full h-full object-contain rounded-[12px]"
+                                    onError={(e) => {
+                                        setFailedImage(true);
+                                        e.currentTarget.src = 'https://placehold.co/150x150?text=Logo';
+                                    }}
                                 />
                             </div>
                         ) : (
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-inner ${bgColors[index % bgColors.length]}`}>
+                            <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-inner ${bgColors[index % bgColors.length]}`}>
                                 {getLogoPlaceholder(job.companyName)}
                             </div>
                         )}
@@ -113,33 +116,33 @@ const JobCard = ({ job, index = 0 }: JobCardProps) => {
                             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
                         </div>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <h3 className="font-bold text-gray-900 text-[16px] line-clamp-1 group-hover:text-indigo-600 transition-colors" title={job.companyName}>
                             {job.companyName}
                         </h3>
-                        <div className="flex items-center gap-1.5 text-gray-400 text-xs mt-1">
-                            <Clock size={12} />
-                            <span>{formatTimeAgo(job.postDate)} trước</span>
+                        <div className="flex items-center gap-1.5 text-gray-400 text-[11px] font-bold uppercase tracking-wider mt-1">
+                            <Clock size={12} className="text-gray-300" />
+                            <span>{formatTimeAgo(job.postDate)} TRƯỚC</span>
                         </div>
                     </div>
-                </div>
-                <button 
+                </Link>
+
+                <button
                     onClick={handleToggleSave}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                        isSaved ? 'text-rose-500 bg-rose-50 shadow-inner' : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50'
-                    }`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${isSaved ? 'text-rose-500 bg-rose-50 shadow-inner' : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50 border border-gray-50'
+                        }`}
                 >
-                    <Heart 
-                        size={20} 
-                        strokeWidth={2} 
-                        className={isSaved ? 'fill-rose-500' : ''} 
+                    <Heart
+                        size={20}
+                        strokeWidth={2.5}
+                        className={isSaved ? 'fill-rose-500' : ''}
                     />
                 </button>
             </div>
 
             {/* Title */}
             <Link to={`/jobs/${job.id}`} className="block mb-4">
-                <h4 className="text-xl font-extrabold text-gray-900 leading-tight group-hover:text-indigo-600 transition-colors line-clamp-2 min-h-[56px]">
+                <h4 className="text-xl font-black text-gray-900 leading-[1.3] group-hover:text-indigo-600 transition-colors line-clamp-2 min-h-[52px]">
                     {job.title}
                 </h4>
             </Link>
@@ -147,7 +150,7 @@ const JobCard = ({ job, index = 0 }: JobCardProps) => {
             {/* Tags */}
             <div className="flex flex-wrap items-center gap-2 mb-8">
                 {job.jobTypeName && (
-                    <div className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold flex items-center gap-1.5 border border-blue-100">
+                    <div className="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 text-[11px] font-bold flex items-center gap-1.5 border border-indigo-100">
                         <Briefcase size={12} />
                         {job.jobTypeName}
                     </div>
@@ -168,25 +171,25 @@ const JobCard = ({ job, index = 0 }: JobCardProps) => {
 
             {/* Footer: Location & Salary */}
             <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-gray-500">
-                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <div className="flex items-center gap-2.5 text-gray-500">
+                    <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100/50">
                         <MapPin size={16} className="text-gray-400" />
                     </div>
-                    <span className="text-sm font-semibold">{job.locationName}</span>
+                    <span className="text-sm font-bold text-gray-600">{job.locationName}</span>
                 </div>
                 <div className="text-right">
-                    <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Mức lương</div>
-                    <div className="text-[16px] font-black text-emerald-600 flex items-center gap-1">
-                        <DollarSign size={14} />
+                    <div className="text-[10px] text-gray-400 uppercase font-black tracking-widest mb-1">Mức lương</div>
+                    <div className="text-[18px] font-black text-emerald-600 flex items-center gap-1">
+                        <DollarSign size={16} className="text-emerald-500" />
                         {formatSalary(job.minSalary, job.maxSalary)}
                     </div>
                 </div>
             </div>
 
-            {/* Apply Action Overlay */}
+            {/* Apply Action Button */}
             <Link
                 to={`/jobs/${job.id}`}
-                className="mt-6 w-full py-4 bg-gray-900 hover:bg-indigo-600 text-white rounded-2xl text-sm font-bold flex items-center justify-center gap-3 shadow-xl shadow-gray-900/10 hover:shadow-indigo-500/30 transition-all duration-300"
+                className="mt-6 w-full py-4 bg-gray-900 hover:bg-indigo-600 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-3 shadow-xl shadow-gray-900/10 hover:shadow-indigo-500/30 transition-all duration-300"
             >
                 Ứng tuyển ngay
                 <ArrowRight size={18} />

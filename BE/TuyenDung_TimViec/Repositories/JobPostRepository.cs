@@ -18,6 +18,7 @@ namespace TuyenDung_TimViec.Repositories
             Guid? experienceId = null, 
             decimal? minSalary = null, 
             decimal? maxSalary = null);
+        Task<JobPost?> GetJobPostByIdAsync(Guid id);
     }
 
     public class JobPostRepository : IJobPostRepository
@@ -181,6 +182,39 @@ namespace TuyenDung_TimViec.Repositories
             return (jobPosts, totalCount);
         }
 
+        public async Task<JobPost?> GetJobPostByIdAsync(Guid id)
+        {
+            string query = @"
+                SELECT jp.*, 
+                       c.Name as CompanyName, c.Logo as CompanyLogo, 
+                       l.Name as LocationName, jt.Name as JobTypeName,
+                       jl.Name as LevelName, el.Name as ExperienceName
+                FROM JobPosts jp
+                LEFT JOIN Companies c ON jp.CompanyId = c.Id
+                LEFT JOIN Locations l ON jp.LocationId = l.Id
+                LEFT JOIN JobTypes jt ON jp.JobTypeId = jt.Id
+                LEFT JOIN Levels jl ON jp.LevelId = jl.Id
+                LEFT JOIN Experiences el ON jp.ExperienceId = el.Id
+                WHERE jp.Id = @id";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    await connection.OpenAsync();
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            return MapJobPost(reader);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         private JobPost MapJobPost(SqlDataReader reader)
         {
             return new JobPost
@@ -194,8 +228,12 @@ namespace TuyenDung_TimViec.Repositories
                 LevelId = reader.IsDBNull(reader.GetOrdinal("LevelId")) ? Guid.Empty : reader.GetGuid(reader.GetOrdinal("LevelId")),
                 ExperienceId = reader.IsDBNull(reader.GetOrdinal("ExperienceId")) ? Guid.Empty : reader.GetGuid(reader.GetOrdinal("ExperienceId")),
                 Title = reader.IsDBNull(reader.GetOrdinal("Title")) ? string.Empty : reader.GetString(reader.GetOrdinal("Title")),
+                Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? string.Empty : reader.GetString(reader.GetOrdinal("Description")),
+                Requirement = reader.IsDBNull(reader.GetOrdinal("Requirement")) ? string.Empty : reader.GetString(reader.GetOrdinal("Requirement")),
+                Benefit = reader.IsDBNull(reader.GetOrdinal("Benefit")) ? string.Empty : reader.GetString(reader.GetOrdinal("Benefit")),
                 MinSalary = reader.IsDBNull(reader.GetOrdinal("MinSalary")) ? 0 : reader.GetDecimal(reader.GetOrdinal("MinSalary")),
                 MaxSalary = reader.IsDBNull(reader.GetOrdinal("MaxSalary")) ? 0 : reader.GetDecimal(reader.GetOrdinal("MaxSalary")),
+                Quantity = reader.IsDBNull(reader.GetOrdinal("Quantity")) ? 0 : reader.GetInt32(reader.GetOrdinal("Quantity")),
                 PostDate = reader.IsDBNull(reader.GetOrdinal("PostDate")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("PostDate")),
                 Deadline = reader.IsDBNull(reader.GetOrdinal("Deadline")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("Deadline")),
                 Status = reader.IsDBNull(reader.GetOrdinal("Status")) ? string.Empty : reader.GetString(reader.GetOrdinal("Status")),

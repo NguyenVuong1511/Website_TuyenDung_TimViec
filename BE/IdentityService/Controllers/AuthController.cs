@@ -1,4 +1,4 @@
-﻿using IdentityService.Models;
+using IdentityService.Models;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Mvc;
 using IdentityService.Repositories;
@@ -88,6 +88,50 @@ namespace IdentityService.Controllers
 
             // 4. Trả kết quả thành công dùng hàm Ok() của RepositoryResult
             return Ok(RepositoryResult<object>.Ok(responseData, "Đăng nhập thành công!"));
+        }
+        // 4. Lấy thông tin tài khoản
+        [HttpGet("account/{userId}")]
+        public IActionResult GetAccountInfo(Guid userId)
+        {
+            var result = _userRepo.GetAccountInfo(userId);
+            if (result.Success) return Ok(result);
+            return NotFound(result);
+        }
+
+        // 5. Đổi mật khẩu
+        [HttpPut("change-password")]
+        public IActionResult ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var result = _userRepo.ChangePassword(request);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+
+        // 6. Đổi Email
+        [HttpPut("change-email")]
+        public IActionResult ChangeEmail([FromBody] ChangeEmailRequest request)
+        {
+            var result = _userRepo.ChangeEmail(request);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+
+        // 7. Cập nhật Profile Candidate
+        [HttpPut("profile/candidate")]
+        public IActionResult UpdateCandidateProfile([FromBody] UpdateCandidateProfileRequest request)
+        {
+            var result = _userRepo.UpdateCandidateProfile(request);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+
+        // 8. Cập nhật Profile Recruiter
+        [HttpPut("profile/recruiter")]
+        public IActionResult UpdateRecruiterProfile([FromBody] UpdateRecruiterProfileRequest request)
+        {
+            var result = _userRepo.UpdateRecruiterProfile(request);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
         }
     }
 }

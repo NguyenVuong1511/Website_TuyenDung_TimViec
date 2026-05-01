@@ -5,6 +5,10 @@ import type {
   RegisterCandidateRequest,
   RegisterRecruiterRequest,
   ApiResponse,
+  ChangePasswordRequest,
+  ChangeEmailRequest,
+  UpdateProfileRequest,
+  AccountInfo,
 } from '../types/auth';
 
 // ─── Tiện ích Quản lý Token ────────────────────────────────────────────────────
@@ -72,3 +76,30 @@ export async function registerRecruiterApi(
 export function logout() {
   clearAuthData();
 }
+
+// ─── Quản lý tài khoản ────────────────────────────────────────────────────────
+export async function getAccountInfoApi(userId: string): Promise<ApiResponse<AccountInfo>> {
+  const { data } = await axiosInstance.get<ApiResponse<AccountInfo>>(`/auth/account/${userId}`);
+  return data;
+}
+
+export async function changePasswordApi(payload: ChangePasswordRequest): Promise<ApiResponse<boolean>> {
+  const { data } = await axiosInstance.put<ApiResponse<boolean>>('/auth/change-password', payload);
+  return data;
+}
+
+export async function changeEmailApi(payload: ChangeEmailRequest): Promise<ApiResponse<boolean>> {
+  const { data } = await axiosInstance.put<ApiResponse<boolean>>('/auth/change-email', payload);
+  return data;
+}
+
+export async function updateCandidateProfileApi(payload: UpdateProfileRequest): Promise<ApiResponse<boolean>> {
+  const { data } = await axiosInstance.put<ApiResponse<boolean>>('/auth/profile/candidate', payload);
+  return data;
+}
+
+export async function updateRecruiterProfileApi(payload: UpdateProfileRequest): Promise<ApiResponse<boolean>> {
+  const { data } = await axiosInstance.put<ApiResponse<boolean>>('/auth/profile/recruiter', payload);
+  return data;
+}
+

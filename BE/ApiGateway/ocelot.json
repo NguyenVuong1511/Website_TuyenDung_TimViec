@@ -12,7 +12,9 @@
       ],
       "UpstreamPathTemplate": "/gateway/auth/{catchAll}",
       "UpstreamHttpMethod": [
-        "Post"
+        "Get",
+        "Post",
+        "Put"
       ]
     },
     // 2.Categories (Ngành nghề)
@@ -112,6 +114,20 @@
     },
     // 7.JobPosts (Danh sách bài đăng)
     {
+      "DownstreamPathTemplate": "/api/jobposts/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/jobposts/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    {
       "DownstreamPathTemplate": "/api/jobposts",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -121,20 +137,6 @@
         }
       ],
       "UpstreamPathTemplate": "/gateway/jobposts",
-      "UpstreamHttpMethod": [
-        "Get"
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/jobposts/top",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7004
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/jobposts/top",
       "UpstreamHttpMethod": [
         "Get"
       ]
