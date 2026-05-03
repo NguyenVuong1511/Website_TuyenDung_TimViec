@@ -93,5 +93,19 @@ namespace TuyenDung_TimViec.Controllers
                 return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
             }
         }
+
+        [HttpGet("company/{companyId}")]
+        public async Task<IActionResult> GetByCompany(Guid companyId)
+        {
+            try
+            {
+                var jobs = await _jobPostRepository.GetJobPostsByCompanyIdAsync(companyId);
+                return Ok(RepositoryResult<object>.Ok(jobs, "Lấy danh sách việc làm theo công ty thành công!"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
     }
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, User, LogOut, Menu, X, History, Heart, LayoutDashboard, Settings, Calendar } from 'lucide-react';
+import { ChevronDown, User, LogOut, Menu, X, History, Heart, LayoutDashboard, Settings, Calendar, Briefcase, Users } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { logout, getToken, getUserRole, getUserId } from '../services/authService';
 import { getCVByUserId } from '../services/cvService';
+import { getMyCompanyApi } from '../services/companyService';
 import { isTokenExpired } from '../utils/jwt';
 
 
@@ -46,9 +47,16 @@ const Header = () => {
       const userId = getUserId();
       if (userId && isLoggedIn) {
         try {
-          const res = await getCVByUserId(userId);
-          if (res.success && res.data?.avatar) {
-            setAvatarUrl(`/images/avatar/${res.data.avatar}`);
+          if (role === 'CANDIDATE') {
+            const res = await getCVByUserId(userId);
+            if (res.success && res.data?.avatar) {
+              setAvatarUrl(`/images/avatar/${res.data.avatar}`);
+            }
+          } else if (role === 'RECRUITER') {
+            const res = await getMyCompanyApi(userId);
+            if (res.success && res.data?.logo) {
+              setAvatarUrl(`/images/${res.data.logo}`);
+            }
           }
         } catch (e) {
           console.error("Failed to fetch avatar for header", e);
@@ -64,9 +72,13 @@ const Header = () => {
 
     const handleAvatarUpdate = () => fetchAvatar();
     window.addEventListener('avatarUpdated', handleAvatarUpdate);
-
-    return () => window.removeEventListener('avatarUpdated', handleAvatarUpdate);
-  }, [isLoggedIn]);
+    window.addEventListener('companyUpdated', handleAvatarUpdate);
+    
+    return () => {
+      window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+      window.removeEventListener('companyUpdated', handleAvatarUpdate);
+    };
+  }, [isLoggedIn, role]);
 
   const handleLogout = () => {
     logout();
@@ -136,16 +148,17 @@ const Header = () => {
 
                   {/* Dropdown Menu */}
                   {showDropdown && (
-                    <div className="absolute right-0 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                    <div className="absolute right-0 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
                       <Link
                         to={(role === 'CANDIDATE' ? '/profile' : '/recruiter-profile')}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors font-bold"
                         onClick={() => setShowDropdown(false)}
                       >
                         <User size={16} />
-                        Hồ sơ cá nhân
+                        {role === 'CANDIDATE' ? 'Hồ sơ cá nhân' : 'Hồ sơ công ty'}
                       </Link>
                       <div className="h-px bg-gray-100 my-1"></div>
+                      
                       {/* Menu cho Ứng viên */}
                       {role === 'CANDIDATE' && (
                         <>
@@ -157,7 +170,6 @@ const Header = () => {
                             <History size={16} />
                             Lịch sử ứng tuyển
                           </Link>
-                          <div className="h-px bg-gray-100 my-1"></div>
                           <Link
                             to="/interviews"
                             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -180,7 +192,7 @@ const Header = () => {
                       )}
 
                       {/* Menu cho Nhà tuyển dụng */}
-                      {(role === 'RECRUITER' || role === 'RECRUITER') && (
+                      {role === 'RECRUITER' && (
                         <>
                           <Link
                             to="/recruiter/dashboard"
@@ -188,11 +200,36 @@ const Header = () => {
                             onClick={() => setShowDropdown(false)}
                           >
                             <LayoutDashboard size={16} />
-                            Quản lý tuyển dụng
+                            Bảng điều khiển
+                          </Link>
+                          <Link
+                            to="/recruiter/post-job"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            <Briefcase size={16} />
+                            Đăng tin tuyển dụng
+                          </Link>
+                          <Link
+                            to="/recruiter/manage-jobs"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            <History size={16} />
+                            Quản lý tin đăng
+                          </Link>
+                          <Link
+                            to="/recruiter/applications"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            <Users size={16} />
+                            Quản lý ứng viên
                           </Link>
                           <div className="h-px bg-gray-100 my-1"></div>
                         </>
                       )}
+                      
                       <Link
                         to="/settings"
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -289,7 +326,7 @@ const Header = () => {
                       <User size={18} />
                     </div>
                   )}
-                  Trang cá nhân
+                  {role === 'CANDIDATE' ? 'Trang cá nhân' : 'Hồ sơ công ty'}
                 </Link>
 
                 {role === 'CANDIDATE' && (
@@ -327,17 +364,39 @@ const Header = () => {
                   </>
                 )}
 
-                {(role === 'RECRUITER' || role === 'RECRUITER') && (
-                  <Link
-                    to="/recruiter/dashboard"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
-                      <LayoutDashboard size={18} />
-                    </div>
-                    Quản lý tuyển dụng
-                  </Link>
+                {role === 'RECRUITER' && (
+                  <>
+                    <Link
+                      to="/recruiter/dashboard"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <LayoutDashboard size={18} />
+                      </div>
+                      Bảng điều khiển
+                    </Link>
+                    <Link
+                      to="/recruiter/post-job"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <Briefcase size={18} />
+                      </div>
+                      Đăng tin mới
+                    </Link>
+                    <Link
+                      to="/recruiter/applications"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <Users size={18} />
+                      </div>
+                      Quản lý ứng viên
+                    </Link>
+                  </>
                 )}
                 <Link
                   to="/settings"

@@ -22,6 +22,11 @@ export async function getJobById(id: string) {
     return data;
 }
 
+export async function getJobsByCompanyId(companyId: string) {
+    const { data } = await axiosInstance.get<ApiResponse<Job[]>>(`/jobposts/company/${companyId}`);
+    return data;
+}
+
 export async function getCategories() {
     const { data } = await axiosInstance.get<ApiResponse<Category[]>>('/categories');
     return data;

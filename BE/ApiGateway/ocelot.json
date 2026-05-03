@@ -34,6 +34,23 @@
     },
     // 3.Companies (Danh sách công ty)
     {
+      "DownstreamPathTemplate": "/api/companies/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/companies/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Put",
+        "Delete"
+      ]
+    },
+    {
       "DownstreamPathTemplate": "/api/companies",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

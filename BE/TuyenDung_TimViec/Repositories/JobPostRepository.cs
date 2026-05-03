@@ -19,6 +19,7 @@ namespace TuyenDung_TimViec.Repositories
             decimal? minSalary = null, 
             decimal? maxSalary = null);
         Task<JobPost?> GetJobPostByIdAsync(Guid id);
+        Task<List<JobPost>> GetJobPostsByCompanyIdAsync(Guid companyId);
     }
 
     public class JobPostRepository : IJobPostRepository
@@ -213,6 +214,41 @@ namespace TuyenDung_TimViec.Repositories
                 }
             }
             return null;
+        }
+
+        public async Task<List<JobPost>> GetJobPostsByCompanyIdAsync(Guid companyId)
+        {
+            var jobPosts = new List<JobPost>();
+            string query = @"
+                SELECT jp.*, 
+                       c.Name as CompanyName, c.Logo as CompanyLogo, 
+                       l.Name as LocationName, jt.Name as JobTypeName,
+                       jl.Name as LevelName, el.Name as ExperienceName
+                FROM JobPosts jp
+                LEFT JOIN Companies c ON jp.CompanyId = c.Id
+                LEFT JOIN Locations l ON jp.LocationId = l.Id
+                LEFT JOIN JobTypes jt ON jp.JobTypeId = jt.Id
+                LEFT JOIN Levels jl ON jp.LevelId = jl.Id
+                LEFT JOIN Experiences el ON jp.ExperienceId = el.Id
+                WHERE jp.CompanyId = @companyId
+                ORDER BY jp.PostDate DESC";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@companyId", companyId);
+                    await connection.OpenAsync();
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            jobPosts.Add(MapJobPost(reader));
+                        }
+                    }
+                }
+            }
+            return jobPosts;
         }
 
         private JobPost MapJobPost(SqlDataReader reader)
