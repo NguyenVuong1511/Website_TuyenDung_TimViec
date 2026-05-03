@@ -16,6 +16,7 @@ import {
   ChevronRight, Edit3, Save, X, Loader2, Camera, Award, Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import JobPagination from '../components/jobs/JobPagination';
 
 const RecruiterProfilePage = () => {
   const userId = getUserId();
@@ -25,6 +26,24 @@ const RecruiterProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Company | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Pagination for jobs
+  const [currentPage, setCurrentPage] = useState(1);
+  const JOBS_PER_PAGE = 4;
+
+  const formatSalary = (min: number, max: number) => {
+    if (!min && !max) return 'Thỏa thuận';
+
+    const formatValue = (val: number) => {
+      if (val >= 1000000) return `${(val / 1000000).toFixed(0)}tr`;
+      if (val >= 1000) return `${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 1)}k`;
+      return val.toString();
+    };
+
+    // If it looks like USD (small numbers), add $
+    const prefix = min < 10000 ? '$' : '';
+    return `${prefix}${formatValue(min)} - ${prefix}${formatValue(max)}`;
+  };
 
   // Logo upload state
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
@@ -57,6 +76,7 @@ const RecruiterProfilePage = () => {
         const jobsRes = await getJobsByCompanyId(res.data.id);
         if (jobsRes.success) {
           setJobs(jobsRes.data);
+          setCurrentPage(1); // Reset to first page when new data is loaded
         }
       }
     } catch (error) {
@@ -507,37 +527,45 @@ const RecruiterProfilePage = () => {
                     <button className="mt-4 text-indigo-600 font-black hover:underline cursor-pointer">Đăng tin ngay</button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {jobs.map(job => (
-                      <Link
-                        key={job.id}
-                        to={`/jobs/${job.id}`}
-                        className="group p-6 rounded-[24px] border border-gray-100 bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-600/5 transition-all relative overflow-hidden"
-                      >
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-indigo-50/50 to-transparent rounded-bl-full group-hover:scale-150 transition-transform duration-500" />
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {jobs.slice((currentPage - 1) * JOBS_PER_PAGE, currentPage * JOBS_PER_PAGE).map(job => (
+                        <Link
+                          key={job.id}
+                          to={`/jobs/${job.id}`}
+                          className="group p-6 rounded-[24px] border border-gray-100 bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-600/5 transition-all relative overflow-hidden"
+                        >
+                          <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-indigo-50/50 to-transparent rounded-bl-full group-hover:scale-150 transition-transform duration-500" />
 
-                        <div className="relative z-10">
-                          <h4 className="text-lg font-black text-gray-900 group-hover:text-indigo-600 transition-colors mb-3 line-clamp-1">{job.title}</h4>
-                          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-bold text-gray-400">
-                            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase tracking-wider">
-                              <Briefcase size={12} /> {job.jobTypeName}
-                            </span>
-                            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase tracking-wider">
-                              <MapPin size={12} /> {job.locationName}
-                            </span>
-                          </div>
-                          <div className="mt-5 pt-5 border-t border-slate-50 flex justify-between items-center">
-                            <span className="text-indigo-600 font-black text-sm">
-                              {job.minSalary && job.maxSalary ? `$${job.minSalary} - $${job.maxSalary}` : 'Thỏa thuận'}
-                            </span>
-                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                              <ChevronRight size={16} />
+                          <div className="relative z-10">
+                            <h4 className="text-lg font-black text-gray-900 group-hover:text-indigo-600 transition-colors mb-3 line-clamp-1">{job.title}</h4>
+                            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-bold text-gray-400">
+                              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase tracking-wider">
+                                <Briefcase size={12} /> {job.jobTypeName}
+                              </span>
+                              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase tracking-wider">
+                                <MapPin size={12} /> {job.locationName}
+                              </span>
+                            </div>
+                            <div className="mt-5 pt-5 border-t border-slate-50 flex justify-between items-center">
+                              <span className="text-emerald-600 font-black text-sm">
+                                {formatSalary(job.minSalary, job.maxSalary)}
+                              </span>
+                              <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                <ChevronRight size={16} />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                        </Link>
+                      ))}
+                    </div>
+
+                    <JobPagination
+                      currentPage={currentPage}
+                      totalPages={Math.ceil(jobs.length / JOBS_PER_PAGE)}
+                      onPageChange={(page) => setCurrentPage(page)}
+                    />
+                  </>
                 )}
               </div>
             </div>
