@@ -232,6 +232,23 @@ const ProfilePage = () => {
     }
   };
 
+  const getFileExtension = (fileData: any) => {
+    // Nếu không có dữ liệu, trả về mặc định
+    if (!fileData) return 'CV';
+
+    // Nếu là chuỗi (URL)
+    if (typeof fileData === 'string') {
+      return fileData.split('.').pop()?.toUpperCase() || 'CV';
+    }
+
+    // Nếu là đối tượng File (khi upload)
+    if (fileData instanceof File || fileData.name) {
+      return fileData.name.split('.').pop()?.toUpperCase() || 'CV';
+    }
+
+    return 'CV';
+  };
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Hiện tại';
     const date = new Date(dateString);
@@ -423,7 +440,7 @@ const ProfilePage = () => {
                         <div className="flex items-center gap-2 mt-2">
                           <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase tracking-wider">Mặc định</span>
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wider">
-                            {cvData.fileUrl.split('.').pop()?.toUpperCase()}
+                            {getFileExtension(cvData.fileUrl)}
                           </span>
                         </div>
                       </div>
@@ -610,9 +627,9 @@ const ProfilePage = () => {
                         title={`Mức độ: ${skill.level}`}
                       >
                         <div className={`w-1.5 h-1.5 rounded-full ${skill.level === 'Xuất sắc' ? 'bg-orange-500' :
-                            skill.level === 'Tốt' ? 'bg-indigo-500' :
-                              skill.level === 'Khá' ? 'bg-teal-500' :
-                                skill.level === 'Trung bình' ? 'bg-blue-500' : 'bg-slate-400'
+                          skill.level === 'Tốt' ? 'bg-indigo-500' :
+                            skill.level === 'Khá' ? 'bg-teal-500' :
+                              skill.level === 'Trung bình' ? 'bg-blue-500' : 'bg-slate-400'
                           }`}></div>
                         {skill.skillName}
                       </span>

@@ -13,6 +13,9 @@ import { toggleSavedJob, checkIsSaved } from '../services/jobService';
 import { getUserId } from '../services/authService';
 import type { Job } from '../types/job';
 import { format } from 'date-fns';
+import ApplyJobModal from '../components/jobs/ApplyJobModal';
+import { checkIfAppliedApi } from '../services/applicationService';
+import { CheckCircle2 } from 'lucide-react';
 
 const JobDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +27,9 @@ const JobDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isApplied, setIsApplied] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [checkingApplication, setCheckingApplication] = useState(false);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -49,6 +55,22 @@ const JobDetailPage = () => {
     };
 
     fetchJob();
+
+    const checkApplication = async () => {
+      if (userId && id) {
+        try {
+          setCheckingApplication(true);
+          const res = await checkIfAppliedApi(userId, id);
+          if (res.success) setIsApplied(res.applied);
+        } catch (err) {
+          console.error('Lỗi kiểm tra trạng thái ứng tuyển:', err);
+        } finally {
+          setCheckingApplication(false);
+        }
+      }
+    };
+
+    checkApplication();
     window.scrollTo(0, 0);
   }, [id, userId]);
 
@@ -70,6 +92,19 @@ const JobDetailPage = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleApplyClick = () => {
+    if (!userId) {
+      navigate('/login');
+      return;
+    }
+    if (isApplied) return;
+    setIsModalOpen(true);
+  };
+
+  const handleApplySuccess = () => {
+    setIsApplied(true);
   };
 
   const formatSalary = (min: number, max: number) => {
@@ -190,9 +225,27 @@ const JobDetailPage = () => {
                 >
                   {saving ? <Loader2 size={24} className="animate-spin" /> : <Heart size={24} fill={isSaved ? 'currentColor' : 'none'} />}
                 </button>
-                <button className="flex-1 lg:flex-none px-10 h-14 bg-indigo-600 text-white rounded-2xl font-black text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 group">
-                  Ứng tuyển ngay
-                  <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                <button
+                  onClick={handleApplyClick}
+                  disabled={isApplied || checkingApplication}
+                  className={`flex-1 lg:flex-none px-10 h-14 rounded-2xl font-black text-lg transition-all shadow-xl flex items-center justify-center gap-3 group ${isApplied
+                    ? 'bg-emerald-500 text-white shadow-emerald-500/30 cursor-default'
+                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/30 cursor-pointer'
+                    }`}
+                >
+                  {checkingApplication ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : isApplied ? (
+                    <>
+                      <CheckCircle2 size={20} />
+                      Đã ứng tuyển
+                    </>
+                  ) : (
+                    <>
+                      Ứng tuyển ngay
+                      <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -345,6 +398,19 @@ const JobDetailPage = () => {
       </main>
 
       <Footer />
+
+      {job && userId && (
+        <ApplyJobModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          jobId={job.id}
+          jobTitle={job.title}
+          companyName={job.companyName}
+          companyLogo={job.companyLogo}
+          userId={userId}
+          onSuccess={handleApplySuccess}
+        />
+      )}
     </div>
   );
 };

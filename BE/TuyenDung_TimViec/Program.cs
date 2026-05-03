@@ -20,6 +20,7 @@ namespace TuyenDung_TimViec
             builder.Services.AddScoped<ILevelRepository, LevelRepository>();
             builder.Services.AddScoped<IExperienceRepository, ExperienceRepository>();
             builder.Services.AddScoped<IJobTypeRepository, JobTypeRepository>();
+            builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 
             var app = builder.Build();
 

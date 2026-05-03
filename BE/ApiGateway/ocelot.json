@@ -141,6 +141,24 @@
         "Get"
       ]
     },
+    // 8. JobApplications (Ứng tuyển)
+    {
+      "DownstreamPathTemplate": "/api/jobapplications/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/jobapplications/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Put",
+        "Delete"
+      ]
+    },
     // 5.JobService 
     {
       "DownstreamPathTemplate": "/{catchAll}",
