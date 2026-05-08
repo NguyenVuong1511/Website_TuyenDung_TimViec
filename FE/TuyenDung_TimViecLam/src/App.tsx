@@ -16,6 +16,9 @@ import AdminDashboardPage from './pages/AdminDashboardPage'
 import CompanyListPage from './pages/CompanyListPage'
 import CompanyDetailPage from './pages/CompanyDetailPage'
 import SalaryCalculatorPage from './pages/SalaryCalculatorPage'
+import CareerHandbookPage from './pages/CareerHandbookPage'
+import ArticleDetailPage from './pages/ArticleDetailPage'
+import CVEditorPage from './pages/CVEditorPage'
 
 import ProtectedRoute from './components/common/ProtectedRoute'
 
@@ -58,6 +61,9 @@ function App() {
         <Route path="/applied-jobs" element={<AppliedJobsPage />} />
         <Route path="/interviews" element={<InterviewsPage />} />
         <Route path="/salary-calculator" element={<SalaryCalculatorPage />} />
+        <Route path="/handbook" element={<CareerHandbookPage />} />
+        <Route path="/handbook/:id" element={<ArticleDetailPage />} />
+        <Route path="/cv-editor" element={<CVEditorPage />} />
         <Route path="/candidates/:id/cv/:cvId" element={<ProfilePage />} />
         <Route path="/candidates/:id" element={<ProfilePage />} />
       </Routes>

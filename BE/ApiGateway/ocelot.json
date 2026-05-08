@@ -252,6 +252,39 @@
         "Delete"
       ]
     },
+    // 12. Articles (Cẩm nang nghề nghiệp)
+    {
+      "DownstreamPathTemplate": "/api/article/{catchAll}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/articles/{catchAll}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Put",
+        "Delete"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/article",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/articles",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post"
+      ]
+    },
     // 5.JobService 
     {
       "DownstreamPathTemplate": "/{catchAll}",

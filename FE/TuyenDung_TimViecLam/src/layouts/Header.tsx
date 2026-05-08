@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, User, LogOut, Menu, X, History, Heart, LayoutDashboard, Settings, Calendar, Users, Briefcase, Building2, ChevronRight } from 'lucide-react';
+import { ChevronDown, User, LogOut, Menu, X, History, Heart, LayoutDashboard, Settings, Calendar, Briefcase, Building2, ChevronRight, Layout } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { logout, getToken, getUserRole, getUserId } from '../services/authService';
 import { getCVByUserId } from '../services/cvService';
@@ -130,7 +130,7 @@ const Header = () => {
                 Tiện ích
                 <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
               </button>
-              
+
               {/* Tool Dropdown */}
               <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="px-4 mb-2">
@@ -146,18 +146,18 @@ const Header = () => {
                   </div>
                 </Link>
                 {role !== 'RECRUITER' && (
-                  <Link to="/profile" className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group/item">
+                  <Link to="/cv-editor" className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group/item">
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover/item:bg-indigo-600 group-hover/item:text-white transition-colors">
-                      <History size={18} />
+                      <Layout size={18} />
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-gray-800">Mẫu CV chuyên nghiệp</div>
-                      <div className="text-[10px] text-gray-500 font-medium">Đa dạng, ấn tượng nhà tuyển dụng</div>
+                      <div className="text-sm font-bold text-gray-800">Thiết kế CV online</div>
+                      <div className="text-[10px] text-gray-500 font-medium">Đa dạng, tải ngay PDF</div>
                     </div>
                   </Link>
                 )}
                 <div className="h-px bg-gray-100 my-2"></div>
-                <Link to="#" className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group/item">
+                <Link to="/handbook" className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group/item">
                   <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover/item:bg-amber-600 group-hover/item:text-white transition-colors">
                     <History size={18} />
                   </div>
@@ -168,11 +168,6 @@ const Header = () => {
                 </Link>
               </div>
             </div>
-
-            <Link to="#" className="flex items-center gap-1.5 text-sm font-bold text-gray-700 hover:text-indigo-600 transition-all font-sans group relative py-2">
-              Cộng đồng
-              <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all duration-300" />
-            </Link>
           </nav>
 
           {/* Right Section */}

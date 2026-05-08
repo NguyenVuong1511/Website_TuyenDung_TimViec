@@ -22,6 +22,7 @@ namespace TuyenDung_TimViec
             builder.Services.AddScoped<IJobTypeRepository, JobTypeRepository>();
             builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
             builder.Services.AddScoped<IInterviewRepository, InterviewRepository>();
+            builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 
             var app = builder.Build();
 
