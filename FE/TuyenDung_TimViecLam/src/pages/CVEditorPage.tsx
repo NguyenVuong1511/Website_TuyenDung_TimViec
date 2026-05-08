@@ -19,7 +19,8 @@ import {
     MessageSquare,
     ArrowLeft,
     Image as ImageIcon,
-    Sparkles
+    Sparkles,
+    MessageSquareWarning
 } from 'lucide-react';
 
 // --- Types ---
@@ -89,6 +90,7 @@ const CVEditorPage = () => {
     });
 
     const cvRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handlePrint = useReactToPrint({
         contentRef: cvRef,
@@ -106,6 +108,21 @@ const CVEditorPage = () => {
 
     const updateField = (field: keyof CVData, value: any) => {
         setCvData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleImageClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                updateField('image', reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const addExperience = () => {
@@ -191,7 +208,7 @@ const CVEditorPage = () => {
                             <style>{`
                                 @media print {
                                     @page { 
-                                        margin: 0.5cm 0; /* Applied to all pages */
+                                        margin: 1cm 0; /* Applied to all pages */
                                     }
                                     @page :first {
                                         margin-top: 0; /* No top margin for the first page */
@@ -201,10 +218,14 @@ const CVEditorPage = () => {
                                         print-color-adjust: exact !important; 
                                     }
                                     .print-section { 
-                                        page-break-inside: avoid; 
-                                        break-inside: avoid; 
+                                        page-break-inside: auto; 
+                                        break-inside: auto; 
                                         margin-bottom: 2rem; 
                                         padding-top: 0.5rem;
+                                    }
+                                    .print-item {
+                                        page-break-inside: avoid;
+                                        break-inside: avoid;
                                     }
                                     .no-print { display: none !important; }
                                     input, textarea { border: none !important; padding: 0 !important; background: transparent !important; resize: none !important; }
@@ -226,21 +247,31 @@ const CVEditorPage = () => {
                             `}</style>
 
                             {/* Teal Header */}
-                            <div className="cv-header bg-[#00BCD4] p-10 text-white relative flex items-center gap-12 overflow-hidden min-h-[300px]">
+                            <div className="cv-header bg-[#00BCD4] p-10 pt-5 text-white relative flex items-center gap-12 overflow-hidden min-h-[300px]">
                                 <div className="absolute bottom-0 right-0 w-full h-16 bg-white transform origin-bottom-right -skew-y-3"></div>
 
                                 {/* Avatar */}
                                 <div className="relative z-10 shrink-0 group/avatar">
-                                    <div className="w-48 h-48 rounded-full border-8 border-white/20 overflow-hidden bg-white shadow-xl relative">
+                                    <div
+                                        className="w-48 h-48 rounded-full border-8 border-white/20 overflow-hidden bg-white shadow-xl relative cursor-pointer group-hover/avatar:border-white/40 transition-all"
+                                        onClick={handleImageClick}
+                                    >
                                         <img src={cvData.image} alt="Avatar" className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex flex-col items-center justify-center text-[10px] font-black uppercase tracking-widest no-print pointer-events-none">
-                                            <ImageIcon size={24} className="mb-1" /> Thay ảnh
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex flex-col items-center justify-center text-[10px] font-black uppercase tracking-widest no-print">
+                                            <ImageIcon size={24} className="mb-1" /> Tải ảnh lên
                                         </div>
                                     </div>
                                     <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                    />
+                                    <input
                                         type="text"
                                         className="absolute -bottom-10 left-0 w-full bg-white text-gray-500 text-[10px] p-2 rounded shadow-lg border border-gray-100 opacity-0 group-hover/avatar:opacity-100 transition-all no-print focus:opacity-100 outline-none"
-                                        placeholder="Dán link ảnh vào đây..."
+                                        placeholder="Hoặc dán link ảnh vào đây..."
                                         value={cvData.image}
                                         onChange={(e) => updateField('image', e.target.value)}
                                     />
@@ -249,17 +280,17 @@ const CVEditorPage = () => {
                                 {/* Header Info */}
                                 <div className="flex-1 relative z-10 pb-6">
                                     <input
-                                        className="cv-input text-5xl font-black mb-2 tracking-tighter border-b-2 border-white/30 uppercase"
+                                        className="cv-input text-xl font-black mb-2 tracking-tighter border-b-2 border-white/30 uppercase"
                                         value={cvData.fullName}
                                         onChange={(e) => updateField('fullName', e.target.value)}
                                     />
                                     <input
-                                        className="cv-input text-xl font-bold text-white/90 mb-8 uppercase tracking-widest"
+                                        className="cv-input text-sm font-bold text-white/90 mb-8 uppercase tracking-widest"
                                         value={cvData.title}
                                         onChange={(e) => updateField('title', e.target.value)}
                                     />
 
-                                    <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px] font-bold">
+                                    <div className="grid grid-cols-2 gap-x-1 gap-y-3 text-[13px] font-bold">
                                         <div className="flex items-center gap-2.5">
                                             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><User size={14} /></div>
                                             <input className="cv-input" value={cvData.gender} onChange={(e) => updateField('gender', e.target.value)} />
@@ -272,7 +303,7 @@ const CVEditorPage = () => {
                                             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><Phone size={14} /></div>
                                             <input className="cv-input" value={cvData.phone} onChange={(e) => updateField('phone', e.target.value)} />
                                         </div>
-                                        <div className="flex items-center gap-2.5">
+                                        <div className="flex items-center gap-2.5 col-span-2">
                                             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><Mail size={14} /></div>
                                             <input className="cv-input" value={cvData.email} onChange={(e) => updateField('email', e.target.value)} />
                                         </div>
@@ -406,7 +437,7 @@ const CVEditorPage = () => {
                                 <div className="col-span-7 space-y-10">
                                     <PrintSection title="TRÌNH ĐỘ HỌC VẤN" icon={<GraduationCap className="text-[#00BCD4]" size={20} />} onAdd={addEducation}>
                                         {cvData.education.map((edu, idx) => (
-                                            <div key={edu.id} className="mb-6 group/item relative">
+                                            <div key={edu.id} className="mb-6 group/item relative print-item">
                                                 <button
                                                     onClick={() => removeEducation(edu.id)}
                                                     className="absolute -left-6 top-0 w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity no-print"
@@ -450,7 +481,7 @@ const CVEditorPage = () => {
                                         onAdd={addExperience}
                                     >
                                         {cvData.experiences.map((exp, idx) => (
-                                            <div key={exp.id} className="mb-8 relative pl-2 group/exp">
+                                            <div key={exp.id} className="mb-8 relative pl-2 group/exp print-item">
                                                 <button
                                                     onClick={() => removeExperience(exp.id)}
                                                     className="absolute -left-6 top-0 w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/exp:opacity-100 transition-opacity no-print"
@@ -522,6 +553,14 @@ const CVEditorPage = () => {
                         </div>
                         <p className="text-xs text-gray-500 font-bold leading-relaxed">
                             Click trực tiếp vào bất kỳ văn bản nào trên CV để chỉnh sửa!
+                        </p>
+                    </div>
+                    <div className="absolute top-50 -left-64 w-56 bg-white p-6 rounded-3xl shadow-xl border border-indigo-100 hidden xl:block animate-bounce-slow">
+                        <div className="flex items-center gap-2 text-indigo-600 font-black text-xs uppercase mb-3">
+                            <MessageSquareWarning size={16} /> Lưu ý
+                        </div>
+                        <p className="text-xs text-gray-500 font-bold leading-relaxed">
+                            Để bảo mật thông tin và tránh mất dữ liệu, vui lòng tải xuống CV ngay khi hoàn thành. Dữ liệu sẽ tự động xóa khi làm mới trang.
                         </p>
                     </div>
                 </div>
