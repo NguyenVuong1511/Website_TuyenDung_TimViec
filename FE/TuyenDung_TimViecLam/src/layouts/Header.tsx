@@ -108,13 +108,13 @@ const Header = () => {
           <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
             <Link to="/jobs" className="flex items-center gap-1.5 text-sm font-bold text-gray-700 hover:text-indigo-600 transition-all font-sans group relative py-2">
               Việc làm
-              <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
+
               <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all duration-300" />
             </Link>
 
             <Link to="/companies" className="flex items-center gap-1.5 text-sm font-bold text-gray-700 hover:text-indigo-600 transition-all font-sans group relative py-2">
               Công ty
-              <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
+
               <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all duration-300" />
             </Link>
 
@@ -128,7 +128,7 @@ const Header = () => {
             <div className="relative group py-2">
               <button className="flex items-center gap-1.5 text-sm font-bold text-gray-700 hover:text-indigo-600 transition-all font-sans outline-none cursor-pointer">
                 Tiện ích
-                <ChevronDown size={14} className="text-gray-400 group-hover:text-indigo-600 transition-colors" />
+
               </button>
 
               {/* Tool Dropdown */}

@@ -85,12 +85,7 @@ const JobCategories = () => {
                             Khám phá cơ hội việc làm ở các ngành nghề được săn đón nhất
                         </p>
                     </div>
-                    <div>
-                        <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-200 text-sm font-bold text-gray-700 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-md transition-all outline-none cursor-pointer group">
-                            Xem tất cả danh mục
-                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                        </button>
-                    </div>
+
                 </div>
 
                 {/* Categories Grid */}
