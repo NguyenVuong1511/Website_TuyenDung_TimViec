@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { getCategories } from "../../services/categoriesService";
 import type { Category } from "../../types/categories";
 import * as LucideIcons from 'lucide-react';
-import { ArrowRight } from 'lucide-react';
 
 
 // Mapping màu sắc cố định để Tailwind có thể quét được toàn bộ class đơn sắc

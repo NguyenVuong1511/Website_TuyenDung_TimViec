@@ -5,7 +5,7 @@ import CompanyCard from '../components/companies/CompanyCard';
 import CompanyFilters from '../components/companies/CompanyFilters';
 import { getCompanies } from '../services/companiesService';
 import type { Company } from '../types/companies';
-import { Loader2, Building2, Search } from 'lucide-react';
+import { Building2, Search } from 'lucide-react';
 
 const CompanyListPage = () => {
     const [companies, setCompanies] = useState<Company[]>([]);
@@ -17,7 +17,7 @@ const CompanyListPage = () => {
         try {
             setLoading(true);
             const response = await getCompanies();
-            
+
             let companyData: Company[] = [];
             if (Array.isArray(response)) {
                 companyData = response;
@@ -44,7 +44,7 @@ const CompanyListPage = () => {
             return;
         }
 
-        const filtered = companies.filter(company => 
+        const filtered = companies.filter(company =>
             company.name.toLowerCase().includes(query.toLowerCase()) ||
             (company.industry && company.industry.toLowerCase().includes(query.toLowerCase()))
         );
